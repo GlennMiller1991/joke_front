@@ -7,7 +7,7 @@ on:
 
 jobs:
   checkout:
-    runs-on: ubuntu:20.17
+    runs-on: ubuntu:latest
     steps:
       - uses: actions/checkout@v4
       - name: status
