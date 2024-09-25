@@ -10,6 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: status
-        run: echo "checkout was finished with success"
-        shell: bash
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run:  docker build - joke-front .
+
+      - name: Save image as archive
+        run:  docker save joke-front -o $ARCHIVE_NAME
+
+      - name: Checkout archive
+        run: ls -lh $ARCHIVE_NAME
+
+      - name: Set archive permissions
+        run: chmod 644 $ARCHIVE_NAME
