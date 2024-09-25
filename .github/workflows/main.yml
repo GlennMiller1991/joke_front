@@ -15,7 +15,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run:  docker build - joke-front .
+        run:  docker build -t joke-front .
 
       - name: Save image as archive
         run:  docker save joke-front -o $ARCHIVE_NAME
