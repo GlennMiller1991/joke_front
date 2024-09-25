@@ -18,10 +18,10 @@ jobs:
         run:  docker build -t joke-front .
 
       - name: Save image as archive
-        run:  docker save joke-front -o $ARCHIVE_NAME
+        run:  docker save joke-front -o ${{ vars.ARCHIVE_NAME }}
 
       - name: Checkout archive
-        run: ls -lh $ARCHIVE_NAME
+        run: ls -lh ${{ vars.ARCHIVE_NAME }}
 
       - name: Set archive permissions
-        run: chmod 644 $ARCHIVE_NAME
+        run: chmod 644 ${{ vars.ARCHIVE_NAME }}
