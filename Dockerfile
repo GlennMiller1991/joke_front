@@ -4,8 +4,10 @@ WORKDIR /usr/app/front
 COPY . .
 
 RUN npm install
+ARG port
+RUN export port=$port
 RUN npm run build
 
-EXPOSE 4000
+EXPOSE $port
 
 CMD ["node", "./dist/front/server/server.mjs"]
