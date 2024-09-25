@@ -25,3 +25,28 @@ jobs:
 
       - name: Set archive permissions
         run: chmod 644 ${{ vars.ARCHIVE_NAME }}
+
+      - name: Replace archive on the VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_KEY }}
+          source: ${{ vars.ARCHIVE_NAME }}
+          target: /home/${{ secrets.VPS_USER_SECONDARY }}/apps/joke/front
+
+      - name: Deploy on the VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_KEY }}
+          script: |
+            docker load -i /home/${{ secrets.VPS_USER_SECONDARY }}/apps/joke/front/${{ vars.ARCHIVE_NAME }}
+            if [ "$(docker ps -q -f name=joke-front)"]; then
+              docker stop joke-front
+            fi
+            if [ "$(docker ps -a -q -f name=joke-front)"]; then
+              docker rm joke-front
+            fi
+            docker run --name joke-front -p4001:4000 -d --rm joke-front
