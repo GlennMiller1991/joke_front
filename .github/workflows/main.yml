@@ -27,7 +27,7 @@ jobs:
         run: chmod 644 ${{ vars.ARCHIVE_NAME }}
 
       - name: Replace archive on the VPS
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
