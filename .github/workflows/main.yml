@@ -43,10 +43,15 @@ jobs:
           password: ${{ secrets.VPS_KEY }}
           script: |
             docker load -i /${{ secrets.VPS_HOME }}/${{ secrets.VPS_USER_SECONDARY }}/${{ secrets.VPS_APPS }}/${{ secrets.VPS_APP }}/${{ vars.ARCHIVE_NAME }}
-            if [ "$(docker ps -q -f name=${{ vars.DOCKER_NAME }})"]; then
-              docker stop ${{ vars.DOCKER_NAME }}
+            
+            if [ "$(docker ps -q -f name=${{ vars.DOCKER_NAME }})" ] 
+              then
+                docker stop ${{ vars.DOCKER_NAME }}
             fi
-            if [ "$(docker ps -a -q -f name=${{ vars.DOCKER_NAME }})"]; then
-              docker rm ${{ vars.DOCKER_NAME }}
+
+            if [ "$(docker ps -a -q -f name=${{ vars.DOCKER_NAME }})" ]
+               then
+                docker rm ${{ vars.DOCKER_NAME }}
             fi
+            
             docker run --env port=${{ secrets.APP_PORT }} --name ${{ vars.DOCKER_NAME }} -p ${{ secrets.DOCKER_MAPPED_PORT }}:${{ secrets.APP_PORT }} -d --rm ${{ vars.DOCKER_NAME }}
