@@ -17,18 +17,17 @@ export function app(): express.Express {
 
   const commonEngine = new CommonEngine();
 
-  console.log('hello')
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  server.get('/api/main-page/shaders/', (req, res) => {
-    res.send('Hello world')
-  })
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
   // // Serve static files from /browser
   server.get('**', express.static(browserDistFolder, {
+    setHeaders: (res, path) => {
+      if(path.endsWith('.glsl')) {
+        res.type('text/html')
+      }
+    },
     maxAge: '1y',
     index: 'index.html',
   }));

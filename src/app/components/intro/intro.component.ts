@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender, inject } from "@angular/core";
 import { log } from "console";
+import { createShader, SHADER_TYPE } from "../../../shared/webgl/create-shader";
 
 
 @Component({
@@ -25,10 +26,14 @@ export class IntroComponent implements OnDestroy {
             this.gl = this.canvas.getContext('webgl2')!
             if (!this.gl) return
 
-            await fetch('/api/main-page/shaders', {
-                method: 'GET'
-            }).then(res => res.text())
-            .then(console.log)
+            let [fragment, vertex] = await Promise.all([
+                request<string>('/main-page/shaders/fragment.glsl'),
+                request<string>('/main-page/shaders/vertex.glsl'),
+            ])
+            if (!fragment.data || !vertex.data) return
+
+            const test = createShader(this.gl, SHADER_TYPE.FRAGMENT, fragment.data)
+
 
             this.gl.clearColor(0.0, 0.0, 0.0, 0)
             this.resizeObserver = new ResizeObserver(this.onResize)
@@ -56,7 +61,65 @@ export class IntroComponent implements OnDestroy {
 
     draw() {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-        
+
     }
 
+}
+
+type ISuccessResponse<T> = {
+    data: T,
+    error?: never,
+}
+
+type IErrorResponse = {
+    data?: never,
+    error: string,
+}
+
+type IResponse<T> = ISuccessResponse<T> | IErrorResponse
+
+export const METHODS = {
+    DELETE: 'DELETE',
+    PATCH: 'PATCH',
+    PUT: 'PUT',
+    POST: 'POST',
+    GET: 'GET'
+} as const
+
+type IRequestOptions = {
+    method: keyof typeof METHODS,
+    mode: RequestMode,
+}
+
+export const RESPONSE_HEADERS = {
+    CONTENT_TYPE: 'content-type'
+} as const
+
+export type IResponseHeaders = {
+    [Key in keyof typeof RESPONSE_HEADERS]: typeof RESPONSE_HEADERS[Key]
+}
+
+export async function request<T>(src: string, options: IRequestOptions = {
+    method: METHODS.GET,
+    mode: 'same-origin',
+}): Promise<IResponse<T>> {
+    try {
+        let response = await fetch(src, {
+            ...options
+        })
+        let contentType = response.headers.get(RESPONSE_HEADERS.CONTENT_TYPE) || ''
+        let method: 'text' | 'json' = 'json'
+        if (/text/.test(contentType)) {
+            method = 'text'
+        }
+
+        let data = await response[method]()
+        return {
+            data,
+        } as ISuccessResponse<T>
+    } catch (err: any) {
+        return {
+            error: err?.message || ''
+        } as IErrorResponse
+    }
 }

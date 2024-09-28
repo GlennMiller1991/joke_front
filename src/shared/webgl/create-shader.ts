@@ -1,4 +1,4 @@
-import { FAILURE, IFailure, IResult } from "../utils";
+import { FAILURE, IFailure } from "../utils";
 
 export type IShaderType = WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER']
 
