@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender, inject } from "@angular/core";
 import { log } from "console";
-import { createShader, SHADER_TYPE } from "../../../shared/webgl/create-shader";
+import { createShader } from "../../../shared/webgl/create-shader";
+import { createProgram } from "../../../shared/webgl/create-program";
 
 
 @Component({
@@ -16,6 +17,7 @@ export class IntroComponent implements OnDestroy {
     parent!: HTMLElement
     canvas!: HTMLCanvasElement
     gl!: WebGL2RenderingContext
+    program!: WebGLProgram
 
     constructor() {
         afterNextRender(async () => {
@@ -30,9 +32,35 @@ export class IntroComponent implements OnDestroy {
                 request<string>('/main-page/shaders/fragment.glsl'),
                 request<string>('/main-page/shaders/vertex.glsl'),
             ])
+
             if (!fragment.data || !vertex.data) return
 
-            const test = createShader(this.gl, SHADER_TYPE.FRAGMENT, fragment.data)
+
+            const fragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, fragment.data, true)
+            const vertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, vertex.data, true)
+
+            if (!fragmentShader || !vertexShader) return
+
+            const program = createProgram(this.gl, [fragmentShader, vertexShader])
+            if (!program) return
+            console.log('program here')
+            this.program = program
+
+            const attrLocation = this.gl.getAttribLocation(program, 'a_position')
+            const buffer = this.gl.createBuffer()
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
+                0, 0,
+                0, 0.5,
+                0.7, 0,
+            ]), this.gl.STATIC_DRAW)
+            const vao = this.gl.createVertexArray()
+            this.gl.bindVertexArray(vao)
+            this.gl.enableVertexAttribArray(attrLocation);
+            this.gl.vertexAttribPointer(attrLocation, 2, this.gl.FLOAT, false, 0, 0)
+
+            this.gl.useProgram(program);
+            this.gl.bindVertexArray(vao);
 
 
             this.gl.clearColor(0.0, 0.0, 0.0, 0)
@@ -48,8 +76,11 @@ export class IntroComponent implements OnDestroy {
     onResize = () => {
         const parent = this.canvasRef.nativeElement.parentElement!
         const rect = parent.getBoundingClientRect()
-        this.canvasRef.nativeElement.width = rect.width
-        this.canvasRef.nativeElement.height = rect.height
+        this.canvas.width = rect.width
+        this.canvas.height = rect.height
+        this.canvas.style.width = `${rect.width}px`
+        this.canvas.style.height = `${rect.height}px`
+        this.gl.viewport(0, 0, rect.width, rect.height);
 
         this.draw()
     }
@@ -61,7 +92,11 @@ export class IntroComponent implements OnDestroy {
 
     draw() {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-
+        var primitiveType = this.gl.TRIANGLES;
+        var offset = 0;
+        var count = 3;
+        this.gl.drawArrays(primitiveType, offset, count);
+        console.log('draw')
     }
 
 }
