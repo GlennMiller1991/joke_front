@@ -4,6 +4,9 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import bootstrap from './src/main.server';
+import { enableProdMode } from '@angular/core';
+
+enableProdMode();
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -14,19 +17,24 @@ export function app(): express.Express {
 
   const commonEngine = new CommonEngine();
 
+  console.log('hello')
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
+  server.get('/api/main-page/shaders/', (req, res) => {
+    res.send('Hello world')
+  })
+
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
+  // // Serve static files from /browser
   server.get('**', express.static(browserDistFolder, {
     maxAge: '1y',
     index: 'index.html',
   }));
 
   // All regular routes use the Angular engine
-  server.get('**', (req, res, next) => {
+  server.route('**').get((req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
     commonEngine
@@ -54,5 +62,4 @@ function run(): void {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
-
 run();

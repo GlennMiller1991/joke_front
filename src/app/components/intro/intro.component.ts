@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender } from "@angular/core";
+import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender, inject } from "@angular/core";
 import { log } from "console";
 
 
@@ -14,23 +14,30 @@ export class IntroComponent implements OnDestroy {
     resizeObserver!: ResizeObserver
     parent!: HTMLElement
     canvas!: HTMLCanvasElement
-    ctx!: WebGL2RenderingContext
+    gl!: WebGL2RenderingContext
 
     constructor() {
-        afterNextRender(() => {
+        afterNextRender(async () => {
             this.canvas = this.canvasRef.nativeElement
             this.parent = this.canvas.parentElement!
             this.canvas.style.background = 'inherit'
             if (!this.parent) return
-            this.ctx = this.canvas.getContext('webgl2')!
-            if (!this.ctx) return
+            this.gl = this.canvas.getContext('webgl2')!
+            if (!this.gl) return
+
+            await fetch('/api/main-page/shaders', {
+                method: 'GET'
+            }).then(res => res.text())
+            .then(console.log)
+
+            this.gl.clearColor(0.0, 0.0, 0.0, 0)
             this.resizeObserver = new ResizeObserver(this.onResize)
             this.resizeObserver.observe(this.canvas.parentElement!)
         })
     }
 
     get isReady() {
-        return this.canvas && this.parent && this.ctx
+        return this.canvas && this.parent && this.gl
     }
 
     onResize = () => {
@@ -38,11 +45,18 @@ export class IntroComponent implements OnDestroy {
         const rect = parent.getBoundingClientRect()
         this.canvasRef.nativeElement.width = rect.width
         this.canvasRef.nativeElement.height = rect.height
+
+        this.draw()
     }
 
     ngOnDestroy() {
         this.resizeObserver?.disconnect
         this.resizeObserver = null as any
+    }
+
+    draw() {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+        
     }
 
 }
