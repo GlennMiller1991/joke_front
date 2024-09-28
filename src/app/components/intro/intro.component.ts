@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender} from "@angular/core";
+import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender } from "@angular/core";
 import { WebglProgram } from '../../../shared/webgl/webgl-program';
 
 
@@ -32,6 +32,16 @@ export class IntroComponent implements OnDestroy {
             ])
 
             if (!fragment.data || !vertex.data) return
+
+            const img = new Image(100, 100)
+            img.onload = console.log
+            img.src = '/main-page/images/movie.png'
+
+            img.style.position = 'absolute'
+            img.style.top = '0'
+            img.style.left = '0'
+            img.style.zIndex = '9999'
+            document.body.appendChild(img)
 
 
             const fragmentShader = WebglProgram.createShader(this.gl, this.gl.FRAGMENT_SHADER, fragment.data, true)

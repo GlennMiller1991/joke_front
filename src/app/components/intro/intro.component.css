@@ -12,6 +12,6 @@
     position: absolute;
     background: transparent;
     left: 50%;
-    height: 50%;
-    transform: tranlate(-50%, -50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
