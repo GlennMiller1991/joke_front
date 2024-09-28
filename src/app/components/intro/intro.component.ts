@@ -1,7 +1,5 @@
-import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender, inject } from "@angular/core";
-import { log } from "console";
-import { createShader } from "../../../shared/webgl/create-shader";
-import { createProgram } from "../../../shared/webgl/create-program";
+import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender} from "@angular/core";
+import { WebglProgram } from '../../../shared/webgl/webgl-program';
 
 
 @Component({
@@ -36,12 +34,12 @@ export class IntroComponent implements OnDestroy {
             if (!fragment.data || !vertex.data) return
 
 
-            const fragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, fragment.data, true)
-            const vertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, vertex.data, true)
+            const fragmentShader = WebglProgram.createShader(this.gl, this.gl.FRAGMENT_SHADER, fragment.data, true)
+            const vertexShader = WebglProgram.createShader(this.gl, this.gl.VERTEX_SHADER, vertex.data, true)
 
             if (!fragmentShader || !vertexShader) return
 
-            const program = createProgram(this.gl, [fragmentShader, vertexShader])
+            const program = WebglProgram.createProgram(this.gl, [fragmentShader, vertexShader])
             if (!program) return
             console.log('program here')
             this.program = program
@@ -76,8 +74,9 @@ export class IntroComponent implements OnDestroy {
     onResize = () => {
         const parent = this.canvasRef.nativeElement.parentElement!
         const rect = parent.getBoundingClientRect()
-        this.canvas.width = rect.width
-        this.canvas.height = rect.height
+        const max = Math.max(rect.width, rect.height)
+        this.canvas.width = max
+        this.canvas.height = max
         this.canvas.style.width = `${rect.width}px`
         this.canvas.style.height = `${rect.height}px`
         this.gl.viewport(0, 0, rect.width, rect.height);

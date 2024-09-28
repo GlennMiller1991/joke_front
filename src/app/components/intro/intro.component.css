@@ -9,5 +9,9 @@
 }
 
 :host > canvas {
-    background: opacity;
+    position: absolute;
+    background: transparent;
+    left: 50%;
+    height: 50%;
+    transform: tranlate(-50%, -50%);
 }
