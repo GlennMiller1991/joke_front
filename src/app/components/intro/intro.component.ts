@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender } from "@angular/core";
 import { WebglProgram } from '../../../shared/webgl/webgl-program';
+import { IPoint2 } from '@fbltd/math'
 
 
 @Component({
@@ -26,6 +27,8 @@ export class IntroComponent implements OnDestroy {
             this.gl = this.canvas.getContext('webgl2')!
             if (!this.gl) return
 
+            const p = new WebglProgram(this.gl)
+
             let [fragment, vertex] = await Promise.all([
                 request<string>('/main-page/shaders/fragment.glsl'),
                 request<string>('/main-page/shaders/vertex.glsl'),
@@ -44,17 +47,13 @@ export class IntroComponent implements OnDestroy {
             document.body.appendChild(img)
 
 
-            const fragmentShader = WebglProgram.createShader(this.gl, this.gl.FRAGMENT_SHADER, fragment.data, true)
-            const vertexShader = WebglProgram.createShader(this.gl, this.gl.VERTEX_SHADER, vertex.data, true)
+            p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
+            p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
+            p.build()
+            if (!p.isOk) return
 
-            if (!fragmentShader || !vertexShader) return
 
-            const program = WebglProgram.createProgram(this.gl, [fragmentShader, vertexShader])
-            if (!program) return
-            console.log('program here')
-            this.program = program
-
-            const attrLocation = this.gl.getAttribLocation(program, 'a_position')
+            const attrLocation = this.gl.getAttribLocation(p.program!, 'a_position')
             const buffer = this.gl.createBuffer()
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
             this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
@@ -67,7 +66,6 @@ export class IntroComponent implements OnDestroy {
             this.gl.enableVertexAttribArray(attrLocation);
             this.gl.vertexAttribPointer(attrLocation, 2, this.gl.FLOAT, false, 0, 0)
 
-            this.gl.useProgram(program);
             this.gl.bindVertexArray(vao);
 
 
@@ -166,4 +164,14 @@ export async function request<T>(src: string, options: IRequestOptions = {
             error: err?.message || ''
         } as IErrorResponse
     }
+}
+
+export type ITriangle = {
+    a: IPoint2, 
+    b: IPoint2, 
+    c: IPoint2,
+}
+
+export function validateType<T>(v: never): never {
+    throw new Error()
 }
