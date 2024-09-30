@@ -53,7 +53,7 @@ export function app(): express.Express {
 
 function run(): void {
   console.log(process.env)
-  const port = process.env['port'] || 4000;
+  const port = process.env['port'] || 7077
 
   // Start up the Node server
   const server = app();

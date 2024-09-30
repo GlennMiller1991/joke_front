@@ -1,177 +1,101 @@
-import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender } from "@angular/core";
-import { WebglProgram } from '../../../shared/webgl/webgl-program';
-import { IPoint, IPoint2 } from '@fbltd/math'
+import {afterNextRender, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {WebglProgram} from '../../../shared/webgl/webgl-program';
+import {Stage} from '../../../shared/webgl/stage/stage';
+import {Plane} from '../../../shared/webgl/stage/plane';
+import {request} from '../../../shared/network/request';
 
 @Component({
-    standalone: true,
-    selector: 'intro-component',
-    templateUrl: './intro.component.html',
-    styleUrl: './intro.component.css'
+  standalone: true,
+  selector: 'intro-component',
+  templateUrl: './intro.component.html',
+  styleUrl: './intro.component.css'
 })
 export class IntroComponent implements OnDestroy {
-    @ViewChild('canvas')
-    canvasRef!: ElementRef<HTMLCanvasElement>
-    resizeObserver!: ResizeObserver
-    parent!: HTMLElement
-    canvas!: HTMLCanvasElement
-    gl!: WebGL2RenderingContext
-    program!: WebGLProgram
+  @ViewChild('canvas')
+  canvasRef!: ElementRef<HTMLCanvasElement>
+  resizeObserver!: ResizeObserver
+  parent!: HTMLElement
+  canvas!: HTMLCanvasElement
+  gl!: WebGL2RenderingContext
+  program!: WebGLProgram
+  stage = new Stage()
 
-    constructor() {
-        afterNextRender(async () => {
-            this.canvas = this.canvasRef.nativeElement
-            this.parent = this.canvas.parentElement!
-            this.canvas.style.background = 'inherit'
-            if (!this.parent) return
-            this.gl = this.canvas.getContext('webgl2')!
-            if (!this.gl) return
+  constructor() {
+    afterNextRender(async () => {
+      this.canvas = this.canvasRef.nativeElement
+      this.parent = this.canvas.parentElement!
+      this.canvas.style.background = 'inherit'
+      if (!this.parent) return
+      this.gl = this.canvas.getContext('webgl2')!
+      if (!this.gl) return
 
-            console.log('after render')
-            const p = new WebglProgram(this.gl)
+      const p = new WebglProgram(this.gl)
 
-            let [fragment, vertex] = await Promise.all([
-                request<string>('/main-page/shaders/fragment.glsl'),
-                request<string>('/main-page/shaders/vertex.glsl'),
-            ])
+      let [fragment, vertex] = await Promise.all([
+        request<string>('/main-page/shaders/fragment.glsl'),
+        request<string>('/main-page/shaders/vertex.glsl'),
+      ])
 
-            if (!fragment.data || !vertex.data) return
-            p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
-            p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
-            p.build()
-            if (!p.isOk) return
-
-
-            // const img = new Image(100, 100)
-            // img.onload = console.log
-            // img.src = '/main-page/images/movie.png'
-
-            // img.style.position = 'absolute'
-            // img.style.top = '0'
-            // img.style.left = '0'
-            // img.style.zIndex = '9999'
-            // document.body.appendChild(img)
+      if (!fragment.data || !vertex.data) return
+      p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
+      p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
+      p.build()
+      if (!p.isOk) return
 
 
-           
+      // const img = new Image(100, 100)
+      // img.src = '/main-page/images/movie.png'
+
+      // img.style.position = 'absolute'
+      // img.style.top = '0'
+      // img.style.left = '0'
+      // img.style.zIndex = '9999'
+      // document.body.appendChild(img)
+
+      const plane = new Plane({origin: [-0.5, -1], width: 1, height: 1})
+      this.stage.addFigure(plane)
+
+      p.allocateVertexes(
+        'a_position',
+        this.stage.vertexes
+      )
 
 
+      this.gl.clearColor(0.0, 0.0, 0.0, 0)
+      this.resizeObserver = new ResizeObserver(this.onResize)
+      this.resizeObserver.observe(this.canvas.parentElement!)
+    })
+  }
 
-            p.allocateVertexes(
-                'a_position',
-                [
-                    0, 0,
-                    0, 0.5,
-                    0.7, 0,
-                    0.5, 0.5,
-                    0, 0.5,
-                    0.7, 0
-                ]
-            )
+  get isReady() {
+    return this.canvas && this.parent && this.gl
+  }
 
+  onResize = () => {
+    const parent = this.canvasRef.nativeElement.parentElement!
+    const rect = parent.getBoundingClientRect()
+    const max = Math.max(rect.width, rect.height)
+    this.canvas.width = max
+    this.canvas.height = max
+    this.canvas.style.width = `${max}px`
+    this.canvas.style.height = `${max}px`
+    this.gl.viewport(0, 0, max, max);
 
-            this.gl.clearColor(0.0, 0.0, 0.0, 0)
-            this.resizeObserver = new ResizeObserver(this.onResize)
-            this.resizeObserver.observe(this.canvas.parentElement!)
-        })
-    }
+    this.draw()
+  }
 
-    get isReady() {
-        return this.canvas && this.parent && this.gl
-    }
+  ngOnDestroy() {
+    this.resizeObserver?.disconnect()
+    this.resizeObserver = null as any
+  }
 
-    onResize = () => {
-        const parent = this.canvasRef.nativeElement.parentElement!
-        const rect = parent.getBoundingClientRect()
-        const max = Math.max(rect.width, rect.height)
-        this.canvas.width = max
-        this.canvas.height = max
-        this.canvas.style.width = `${rect.width}px`
-        this.canvas.style.height = `${rect.height}px`
-        this.gl.viewport(0, 0, rect.width, rect.height);
-
-        this.draw()
-    }
-
-    ngOnDestroy() {
-        this.resizeObserver?.disconnect
-        this.resizeObserver = null as any
-    }
-
-    draw() {
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-        var primitiveType = this.gl.TRIANGLES;
-        var offset = 0;
-        var count = 0;
-        this.gl.drawArrays(primitiveType, offset, count);
-        console.log('draw')
-    }
+  draw() {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+    const primitiveType = this.gl.TRIANGLES;
+    const offset = 0;
+    const count = this.stage.vertexesQty;
+    this.gl.drawArrays(primitiveType, offset, count);
+  }
 
 }
 
-type ISuccessResponse<T> = {
-    data: T,
-    error?: never,
-}
-
-type IErrorResponse = {
-    data?: never,
-    error: string,
-}
-
-type IResponse<T> = ISuccessResponse<T> | IErrorResponse
-
-export const METHODS = {
-    DELETE: 'DELETE',
-    PATCH: 'PATCH',
-    PUT: 'PUT',
-    POST: 'POST',
-    GET: 'GET'
-} as const
-
-type IRequestOptions = {
-    method: keyof typeof METHODS,
-    mode: RequestMode,
-}
-
-export const RESPONSE_HEADERS = {
-    CONTENT_TYPE: 'content-type'
-} as const
-
-export type IResponseHeaders = {
-    [Key in keyof typeof RESPONSE_HEADERS]: typeof RESPONSE_HEADERS[Key]
-}
-
-export async function request<T>(src: string, options: IRequestOptions = {
-    method: METHODS.GET,
-    mode: 'same-origin',
-}): Promise<IResponse<T>> {
-    try {
-        let response = await fetch(src, {
-            ...options
-        })
-        let contentType = response.headers.get(RESPONSE_HEADERS.CONTENT_TYPE) || ''
-        let method: 'text' | 'json' = 'json'
-        if (/text/.test(contentType)) {
-            method = 'text'
-        }
-
-        let data = await response[method]()
-        return {
-            data,
-        } as ISuccessResponse<T>
-    } catch (err: any) {
-        return {
-            error: err?.message || ''
-        } as IErrorResponse
-    }
-}
-
-export type ITriangle = {
-    a: IPoint2,
-    b: IPoint2,
-    c: IPoint2,
-}
-
-export function validateType<T>(v: never): never {
-    throw new Error()
-}

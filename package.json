@@ -7,7 +7,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:back": "npx nodemon dist/front/server/server.mjs",
-    "dev": "npm run watch & npm run serve:back"
+    "dev": "npm run serve:back & npm run watch"
   },
   "private": true,
   "dependencies": {
