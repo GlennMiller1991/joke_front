@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender } from "@angular/core";
 import { WebglProgram } from '../../../shared/webgl/webgl-program';
-import { IPoint2 } from '@fbltd/math'
-
+import { IPoint, IPoint2 } from '@fbltd/math'
 
 @Component({
     standalone: true,
@@ -27,6 +26,7 @@ export class IntroComponent implements OnDestroy {
             this.gl = this.canvas.getContext('webgl2')!
             if (!this.gl) return
 
+            console.log('after render')
             const p = new WebglProgram(this.gl)
 
             let [fragment, vertex] = await Promise.all([
@@ -35,38 +35,38 @@ export class IntroComponent implements OnDestroy {
             ])
 
             if (!fragment.data || !vertex.data) return
-
-            const img = new Image(100, 100)
-            img.onload = console.log
-            img.src = '/main-page/images/movie.png'
-
-            img.style.position = 'absolute'
-            img.style.top = '0'
-            img.style.left = '0'
-            img.style.zIndex = '9999'
-            document.body.appendChild(img)
-
-
-            p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
             p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
+            p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
             p.build()
             if (!p.isOk) return
 
 
-            const attrLocation = this.gl.getAttribLocation(p.program!, 'a_position')
-            const buffer = this.gl.createBuffer()
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
-                0, 0,
-                0, 0.5,
-                0.7, 0,
-            ]), this.gl.STATIC_DRAW)
-            const vao = this.gl.createVertexArray()
-            this.gl.bindVertexArray(vao)
-            this.gl.enableVertexAttribArray(attrLocation);
-            this.gl.vertexAttribPointer(attrLocation, 2, this.gl.FLOAT, false, 0, 0)
+            // const img = new Image(100, 100)
+            // img.onload = console.log
+            // img.src = '/main-page/images/movie.png'
 
-            this.gl.bindVertexArray(vao);
+            // img.style.position = 'absolute'
+            // img.style.top = '0'
+            // img.style.left = '0'
+            // img.style.zIndex = '9999'
+            // document.body.appendChild(img)
+
+
+           
+
+
+
+            p.allocateVertexes(
+                'a_position',
+                [
+                    0, 0,
+                    0, 0.5,
+                    0.7, 0,
+                    0.5, 0.5,
+                    0, 0.5,
+                    0.7, 0
+                ]
+            )
 
 
             this.gl.clearColor(0.0, 0.0, 0.0, 0)
@@ -101,7 +101,7 @@ export class IntroComponent implements OnDestroy {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
         var primitiveType = this.gl.TRIANGLES;
         var offset = 0;
-        var count = 3;
+        var count = 0;
         this.gl.drawArrays(primitiveType, offset, count);
         console.log('draw')
     }
@@ -167,8 +167,8 @@ export async function request<T>(src: string, options: IRequestOptions = {
 }
 
 export type ITriangle = {
-    a: IPoint2, 
-    b: IPoint2, 
+    a: IPoint2,
+    b: IPoint2,
     c: IPoint2,
 }
 

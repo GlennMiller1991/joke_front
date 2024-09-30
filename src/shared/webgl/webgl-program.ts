@@ -11,10 +11,10 @@ export class WebglProgram {
     }
 
     get isShaderOk() {
-        return !!(this.fragmentShader && this.vertexShader)
+        return !!(this.vertexShader && this.fragmentShader)
     }
 
-    isOk() {
+    get isOk() {
         return !!(this.isShaderOk && this.program)
     }
 
@@ -54,6 +54,19 @@ export class WebglProgram {
         return SUCCESS
     }
 
+    allocateVertexes(name: string, vertexes: Array<number>) {
+        if (!this.isOk) return
+        const attrLocation = this.gl.getAttribLocation(this.program!, name)
+        const buffer = this.gl.createBuffer()
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexes), this.gl.STATIC_DRAW)
+        const vao = this.gl.createVertexArray()
+        this.gl.bindVertexArray(vao)
+        this.gl.enableVertexAttribArray(attrLocation);
+        this.gl.vertexAttribPointer(attrLocation, 2, this.gl.FLOAT, false, 0, 0)
+
+    }
+
     get program() {
         return this._program
     }
@@ -82,31 +95,6 @@ export class WebglProgram {
         if (!shader) return
         if (this._fragmentShader) return
         this._fragmentShader = shader
-    }
-
-
-    getShader(type: IShaderType) {
-        switch (type) {
-            case this.gl.VERTEX_SHADER:
-                return this.vertexShader
-            case this.gl.FRAGMENT_SHADER:
-                return this.fragmentShader
-            default:
-                return validateType(type)
-        }
-    }
-
-    setShader(shader: WebGLShader, type: IShaderType) {
-        switch (type) {
-            case this.gl.VERTEX_SHADER:
-                this._vertexShader = shader
-                break
-            case this.gl.FRAGMENT_SHADER:
-                this._fragmentShader = shader
-                break;
-            default:
-                validateType(type)
-        }
     }
 
     static createProgram(gl: WebGL2RenderingContext, shaders: WebGLShader[]) {
