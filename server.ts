@@ -28,7 +28,7 @@ export function app(): express.Express {
         res.type('text/html')
       }
     },
-    maxAge: '1y',
+    maxAge: '1s',
     index: 'index.html',
   }));
 

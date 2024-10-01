@@ -56,14 +56,14 @@ export class WebglProgram {
 
   allocateVertexes(name: string, vertexes: Array<number>) {
     if (!this.isOk) return
-    const attrLocation = this.gl.getAttribLocation(this.program!, name)
+    // const attrLocation = this.gl.getAttribLocation(this.program!, name)
     const buffer = this.gl.createBuffer()
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexes), this.gl.STATIC_DRAW)
     const vao = this.gl.createVertexArray()
     this.gl.bindVertexArray(vao)
-    this.gl.enableVertexAttribArray(attrLocation);
-    this.gl.vertexAttribPointer(attrLocation, 2, this.gl.FLOAT, false, 0, 0)
+    this.gl.enableVertexAttribArray(0);
+    this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0)
 
   }
 
@@ -118,7 +118,7 @@ export class WebglProgram {
    * @param type Тип шейдера - фрагментный/вершинный (gl.VERTEXT_SHADER | gl.FRAGMENT_SHADER)
    * @param source текст шейдерной программы
    */
-  static createShader(gl: WebGL2RenderingContext, type: IShaderType, source: string, verbose?: true): WebGLShader | IFailure {
+  static createShader(gl: WebGL2RenderingContext, type: IShaderType, source: string, verbose: true = true): WebGLShader | IFailure {
     const shader = gl.createShader(type)
     if (!shader) return FAILURE
     gl.shaderSource(shader, source);

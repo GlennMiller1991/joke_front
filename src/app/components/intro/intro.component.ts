@@ -61,7 +61,7 @@ export class IntroComponent implements OnDestroy {
       )
 
 
-      this.gl.clearColor(0.0, 0.0, 0.0, 0)
+      this.gl.clearColor(0.6, 0.6, 0.8, 1.0)
       this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.canvas.parentElement!)
     })
@@ -98,4 +98,3 @@ export class IntroComponent implements OnDestroy {
   }
 
 }
-
