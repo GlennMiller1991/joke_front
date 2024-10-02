@@ -54,17 +54,16 @@ export class WebglProgram {
     return SUCCESS
   }
 
-  allocateVertexes(name: string, vertexes: Array<number>) {
+  allocateVertexes(name: string, vertexes: Array<number>, size: number) {
     if (!this.isOk) return
-    // const attrLocation = this.gl.getAttribLocation(this.program!, name)
-    const buffer = this.gl.createBuffer()
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
+    const attrLocation = this.gl.getAttribLocation(this.program!, name)
+    const vbo = this.gl.createBuffer()
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo)
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexes), this.gl.STATIC_DRAW)
     const vao = this.gl.createVertexArray()
     this.gl.bindVertexArray(vao)
-    this.gl.enableVertexAttribArray(0);
-    this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0)
-
+    this.gl.enableVertexAttribArray(attrLocation);
+    this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
   }
 
   get program() {

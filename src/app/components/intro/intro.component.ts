@@ -57,7 +57,14 @@ export class IntroComponent implements OnDestroy {
 
       p.allocateVertexes(
         'a_position',
-        this.stage.vertexes
+        this.stage.vertexes,
+        2
+      )
+
+      p.allocateVertexes(
+        'a_color',
+        this.stage.colors,
+        3
       )
 
 
@@ -80,6 +87,7 @@ export class IntroComponent implements OnDestroy {
     this.canvas.style.width = `${max}px`
     this.canvas.style.height = `${max}px`
     this.gl.viewport(0, 0, max, max);
+    this.gl.lineWidth(10)
 
     this.draw()
   }
@@ -91,7 +99,7 @@ export class IntroComponent implements OnDestroy {
 
   draw() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-    const primitiveType = this.gl.TRIANGLES;
+    const primitiveType = this.gl.POINTS;
     const offset = 0;
     const count = this.stage.vertexesQty;
     this.gl.drawArrays(primitiveType, offset, count);

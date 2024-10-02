@@ -6,7 +6,7 @@ import { PreloaderComponent } from './components/preloader/preloader.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, IntroComponent, PreloaderComponent],
+  imports: [RouterOutlet, IntroComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

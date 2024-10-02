@@ -1,8 +1,8 @@
 import {Point} from '@fbltd/math';
-import {IRect} from './contracts';
+import {IFigure, IRect} from './contracts';
 import {Triangle} from './triangle';
 
-export class Plane {
+export class Plane implements IFigure {
   private children: [Triangle, Triangle] | Plane[]
 
   constructor(private rect: IRect) {
@@ -21,9 +21,15 @@ export class Plane {
   }
 
   get vertexes() {
-    const children = this.children
-    return (children as Array<Plane | Triangle>).reduce((acc, child) => {
+    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
       acc.push(...child.vertexes)
+      return acc
+    }, [] as number[])
+  }
+
+  get colors() {
+    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
+      acc.push(...child.colors)
       return acc
     }, [] as number[])
   }
