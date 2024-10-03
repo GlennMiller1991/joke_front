@@ -1,21 +1,24 @@
 .btn {
     position: relative;
-    height: 7em;
-    width: 7em;
     border-radius: 50%;
+    width: var(--size);
+    height: var(--size);
     outline: none;
     border: 3px #090909 solid;
     background: linear-gradient(145deg, #171717, #444245);
     box-shadow: inset 2px 2px 0px #7d7c7e,
         inset -2px -2px 0px #1c1c1c;
     color: #a6a6a6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .btn span {
-    font-size: 1.9em;
+    font-size: calc(var(--size) * 0.2);
 }
 
-.btn::before {
+.elevated::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -23,8 +26,8 @@
     transform: translate(-50%, -50%);
     border-radius: inherit;
     background: linear-gradient(145deg, #262626, #606060);
-    width: 7.25em;
-    height: 7.25em;
+    width: calc(var(--size) * 1.1);
+    height: calc(var(--size) * 1.1);
     z-index: -1;
     box-shadow: 11px 11px 22px #141414,
         -11px -11px 22px #525252;
