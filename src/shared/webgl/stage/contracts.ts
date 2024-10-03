@@ -5,3 +5,9 @@ export type IRect = {
   height: number,
   origin: IPoint2
 }
+
+export interface IFigure {
+  get vertexes(): number[]
+
+  get colors(): number[]
+}

@@ -15,6 +15,13 @@ export class Stage {
     }, [] as number[])
   }
 
+  get colors() {
+    return this.figures.reduce((acc, child) => {
+      acc.push(...child.colors)
+      return acc
+    }, [] as number[])
+  }
+
   get vertexesQty() {
     return this.figures.reduce((acc, child) => {
       return acc + child.vertexesQty
