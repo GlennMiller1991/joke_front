@@ -5,7 +5,7 @@ import { Component, Input } from "@angular/core";
     standalone: true,
     selector: 'button-component',
     templateUrl: './button.component.html',
-    styleUrl: './button.component.css',
+    styleUrls:[ './elevated.component.css', 'flush.component.css'],
     imports: [
         NgClass, NgStyle,
     ]
@@ -16,7 +16,7 @@ export class ButtonComponent {
 
     get classes() {
         return {
-            btn: true,
+            flush: this.baseType === 'flush',
             elevated: this.baseType === 'elevated'
         }
     }
