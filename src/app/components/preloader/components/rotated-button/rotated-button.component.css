@@ -1,0 +1,17 @@
+.pimpContainer {
+    position: absolute;
+    inset: 0;
+    transform-origin: center;
+    z-index: 2;    
+}
+
+.pimpContainer > div {
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: var(--color);
+    right: 10%;
+    top: 50%;
+    transform: translate(-50%, -50%)
+}

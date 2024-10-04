@@ -5,7 +5,7 @@ import { Component, Input } from "@angular/core";
     standalone: true,
     selector: 'button-component',
     templateUrl: './button.component.html',
-    styleUrls:[ './elevated.component.css', 'flush.component.css'],
+    styleUrls:[ './base.component.css', './elevated.component.css', './flush.component.css'],
     imports: [
         NgClass, NgStyle,
     ]

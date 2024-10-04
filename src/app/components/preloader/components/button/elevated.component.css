@@ -8,7 +8,7 @@
     background: linear-gradient(145deg, #171717, #444245);
     box-shadow: inset 2px 2px 0px #7d7c7e,
         inset -2px -2px 0px #1c1c1c;
-    color: #a6a6a6;
+    color: var(--color);
     display: flex;
     justify-content: center;
     align-items: center;
