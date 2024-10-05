@@ -1,4 +1,6 @@
-<button ngModel #button [ngClass]="classes" style="--size:{{size}}; --color:#a6a6a6; --active-color:#fff">
+<button ngModel #button (mousedown)="onMouseDown()" (touchstart)="onMouseDown()" (pointerdown)="onMouseDown()"
+    [ngClass]="classes" (mouseup)="onMouseLeave()" (mouseleave)="onMouseLeave()"
+    style="--size:{{size}}; --color:#a6a6a6; --active-color:#fff">
     <span>
         <ng-content />
     </span>

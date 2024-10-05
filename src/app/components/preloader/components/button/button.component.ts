@@ -1,5 +1,5 @@
 import { NgClass, NgStyle } from "@angular/common";
-import { afterNextRender, Component, ElementRef, Input, OnDestroy, ViewChild } from "@angular/core";
+import { afterNextRender, afterRender, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from "@angular/core";
 
 @Component({
     standalone: true,
@@ -10,33 +10,19 @@ import { afterNextRender, Component, ElementRef, Input, OnDestroy, ViewChild } f
         NgClass, NgStyle,
     ]
 })
-export class ButtonComponent implements OnDestroy {
+export class ButtonComponent {
     @Input() baseType: 'flush' | 'elevated' = 'elevated'
     @Input() size: string = '7em'
     @ViewChild('button') buttonRef!: ElementRef<HTMLButtonElement>
     isActive = false
 
-    constructor() {
-        afterNextRender(this.afterNextRender)
-    }
 
-    afterNextRender = async () => {
-        this.buttonRef.nativeElement.addEventListener('mousedown', this.onMouseDown)
-    }
-
-    private onMouseDown = () => {
-        console.log('onMouseDown')
+    onMouseDown = () => {
         this.isActive = true
-        this.buttonRef.nativeElement.addEventListener('mouseleave', this.onMouseLeave)
-        document.addEventListener('mouseup', this.onMouseLeave)
-        console.log(this.isActive)
     }
 
-    private onMouseLeave = () => {
+    onMouseLeave = () => {
         this.isActive = false
-        console.log(this.isActive)
-        this.buttonRef.nativeElement.removeEventListener('mouseleave', this.onMouseLeave)
-        document.removeEventListener('mouseup', this.onMouseLeave)
     }
 
 
@@ -48,14 +34,4 @@ export class ButtonComponent implements OnDestroy {
         }
     }
 
-    get btnStyles() {
-        return {
-            height: this.size,
-            width: this.size,
-        }
-    }
-
-    ngOnDestroy(): void {
-        this.buttonRef.nativeElement.removeEventListener('mousedown', this.onMouseDown)
-    }
 }

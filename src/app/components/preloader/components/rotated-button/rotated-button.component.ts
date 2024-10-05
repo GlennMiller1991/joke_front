@@ -11,8 +11,4 @@ import { ButtonComponent } from "../button/button.component";
     ]
 })
 export class RotatedButtonComponent extends ButtonComponent {
-    constructor() {
-        super()
-    }
-
 }
