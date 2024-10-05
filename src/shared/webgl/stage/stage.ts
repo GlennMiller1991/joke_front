@@ -1,30 +1,29 @@
-import {Plane} from './plane';
-import {Triangle} from './triangle';
+import { StageGroup } from './stage-group';
 
 export class Stage {
-  figures: (Plane | Triangle)[] = []
+  figures: StageGroup[] = []
 
-  addFigure(figure: typeof this.figures[0]) {
+  addObject(figure: typeof this.figures[0]) {
     this.figures.push(figure)
   }
 
   get vertexes() {
     return this.figures.reduce((acc, child) => {
-      acc.push(...child.vertexes)
+      acc.push(...child.figure.vertexes)
       return acc
     }, [] as number[])
   }
 
   get colors() {
     return this.figures.reduce((acc, child) => {
-      acc.push(...child.colors)
+      acc.push(...child.figure.colors)
       return acc
     }, [] as number[])
   }
 
   get vertexesQty() {
     return this.figures.reduce((acc, child) => {
-      return acc + child.vertexesQty
+      return acc + child.figure.vertexesQty
     }, 0)
   }
 

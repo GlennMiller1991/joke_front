@@ -1,31 +1,68 @@
-import {IPoint2} from '@fbltd/math';
-import {IFigure} from './contracts';
+import { Color, IMatrix2d, IPoint2, Matrix2d } from '@fbltd/math';
+import { IFigure } from './contracts';
+
+export class Vertex implements IFigure {
+
+  constructor(private point: IPoint2, private color: Color) {
+
+  }
+
+  get colors() {
+    return [
+      this.color.red, this.color.green, this.color.blue
+    ]
+  }
+
+  get vertexes() {
+    return [
+      ...this.point
+    ]
+  }
+
+  get vertexesQty() {
+    return 1
+  }
+
+  transformVertexes(transform: IMatrix2d): IFigure['vertexes'] {
+    return [
+      ...Matrix2d.apply(transform, this.point)
+    ]
+  }
+}
 
 export class Triangle implements IFigure {
-  public aColor: number = 0.5
-  public bColor: number = 0.5
-  public cColor: number = 0.5
+  public red: number = 0.2
+  public green: number = 0.7
+  public blue: number = 0.1
 
   constructor(
-    public a: IPoint2,
-    public b: IPoint2,
-    public c: IPoint2,
+    public a: Vertex,
+    public b: Vertex,
+    public c: Vertex,
   ) {
   }
 
   get vertexes(): number[] {
     return [
-      ...this.a,
-      ...this.b,
-      ...this.c,
+      ...this.a.vertexes,
+      ...this.b.vertexes,
+      ...this.c.vertexes,
     ]
   }
 
   get colors(): number[] {
     return [
-      this.aColor,
-      this.bColor,
-      this.cColor,
+      ...this.a.colors,
+      ...this.b.colors,
+      ...this.c.colors,
+    ]
+  }
+
+  transformVertexes(transform: IMatrix2d): IFigure['vertexes'] {
+    return [
+      ...this.a.transformVertexes(transform),
+      ...this.b.transformVertexes(transform),
+      ...this.c.transformVertexes(transform),
     ]
   }
 

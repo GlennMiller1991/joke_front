@@ -1,8 +1,10 @@
-import {afterNextRender, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {WebglProgram} from '../../../shared/webgl/webgl-program';
-import {Stage} from '../../../shared/webgl/stage/stage';
-import {Plane} from '../../../shared/webgl/stage/plane';
-import {request} from '../../../shared/network/request';
+import { afterNextRender, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { WebglProgram } from '../../../shared/webgl/webgl-program';
+import { Stage } from '../../../shared/webgl/stage/stage';
+import { Plane } from '../../../shared/webgl/stage/plane';
+import { request } from '../../../shared/network/request';
+import { StageGroup } from '../../../shared/webgl/stage/stage-group';
+import { Color } from '@fbltd/math';
 
 @Component({
   standalone: true,
@@ -43,32 +45,12 @@ export class IntroComponent implements OnDestroy {
       if (!p.isOk) return
 
 
-      // const img = new Image(100, 100)
-      // img.src = '/main-page/images/movie.png'
-
-      // img.style.position = 'absolute'
-      // img.style.top = '0'
-      // img.style.left = '0'
-      // img.style.zIndex = '9999'
-      // document.body.appendChild(img)
-
-      const plane = new Plane({origin: [-0.5, -1], width: 1, height: 1})
-      this.stage.addFigure(plane)
-
-      p.allocateVertexes(
-        'a_position',
-        this.stage.vertexes,
-        2
-      )
-
-      p.allocateVertexes(
-        'a_color',
-        this.stage.colors,
-        3
-      )
+      const plane = new Plane({ origin: [-0.5, -1], width: 1, height: 1 }, new Color(0.1, 0.3, 0.7))
+      const planeObject = new StageGroup(p, plane)
+      planeObject.init()
+      this.stage.addObject(planeObject)
 
 
-      this.gl.clearColor(0.6, 0.6, 0.8, 1.0)
       this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.canvas.parentElement!)
     })
@@ -99,7 +81,7 @@ export class IntroComponent implements OnDestroy {
 
   draw() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-    const primitiveType = this.gl.POINTS;
+    const primitiveType = this.gl.TRIANGLES;
     const offset = 0;
     const count = this.stage.vertexesQty;
     this.gl.drawArrays(primitiveType, offset, count);

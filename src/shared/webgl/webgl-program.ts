@@ -1,6 +1,6 @@
-import {FAILURE, IFailure, SUCCESS} from '../utils';
-import {IShaderType} from './contracts';
-import {validateType} from '../common/validate-type';
+import { FAILURE, IFailure, SUCCESS } from '../utils';
+import { IShaderType } from './contracts';
+import { validateType } from '../common/validate-type';
 
 export class WebglProgram {
   _vertexShader: WebGLShader | undefined
@@ -51,7 +51,15 @@ export class WebglProgram {
     if (!p) return p
     this.program = p
     this.gl.useProgram(p)
+    this.applySettings();
     return SUCCESS
+  }
+
+  applySettings() {
+    this.gl.clearColor(0.6, 0.6, 0.8, 1.0)
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.cullFace(this.gl.BACK);
+    this.gl.frontFace(this.gl.CW);
   }
 
   allocateVertexes(name: string, vertexes: Array<number>, size: number) {
@@ -60,10 +68,15 @@ export class WebglProgram {
     const vbo = this.gl.createBuffer()
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbo)
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexes), this.gl.STATIC_DRAW)
-    const vao = this.gl.createVertexArray()
+    const vao = this.createVertexArray()
     this.gl.bindVertexArray(vao)
     this.gl.enableVertexAttribArray(attrLocation);
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
+  }
+
+  createVertexArray() {
+    const vao = this.gl.createVertexArray()
+    return vao
   }
 
   get program() {
