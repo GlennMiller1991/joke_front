@@ -1,5 +1,6 @@
 <button-component baseType="flush" size="{{size}}">
-    <div class="pimpContainer">
-        <div></div>
+    <div class="pimpContainer" (mousedown)="onMouseDown($event)" (touchstart)="onMouseDown($event)"
+        (mouseup)="onMouseLeave($event)" (mouseleave)="onMouseLeave($event)">
+        <div class="pimp" [class.active]="isActive"></div>
     </div>
 </button-component>

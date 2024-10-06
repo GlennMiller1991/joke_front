@@ -13,15 +13,18 @@ import { afterNextRender, afterRender, ChangeDetectionStrategy, Component, Eleme
 export class ButtonComponent {
     @Input() baseType: 'flush' | 'elevated' = 'elevated'
     @Input() size: string = '7em'
+    @Input() isDisabled: boolean = false
+    @Input() isActive = false
     @ViewChild('button') buttonRef!: ElementRef<HTMLButtonElement>
-    isActive = false
 
 
-    onMouseDown = () => {
+    onMouseDown(event: Event) {
+        if (this.isDisabled) return
         this.isActive = true
     }
 
-    onMouseLeave = () => {
+    onMouseLeave(event: Event) {
+        if (this.isDisabled) return
         this.isActive = false
     }
 

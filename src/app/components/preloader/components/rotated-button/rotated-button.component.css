@@ -5,7 +5,7 @@
     z-index: 2;    
 }
 
-.pimpContainer > div {
+.pimp {
     position: absolute;
     height: 10px;
     width: 10px;
@@ -14,4 +14,8 @@
     right: 10%;
     top: 50%;
     transform: translate(-50%, -50%)
+}
+
+.active {
+    background: var(--active-color);
 }
