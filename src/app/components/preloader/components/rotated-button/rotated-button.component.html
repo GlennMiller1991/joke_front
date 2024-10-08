@@ -1,5 +1,6 @@
 <button-component baseType="flush" size="{{size}}">
-    <div class="pimpContainer" (mousedown)="onMouseDown($event)" (touchstart)="onMouseDown($event)"
+    <div class="pimpContainer" [ngStyle]="{transform: angle}" (mousedown)="onMouseDown($event)" (touchstart)="onMouseDown($event)"
+        (mousemove)="onMouseMove($event)"
         (mouseup)="onMouseLeave($event)" (mouseleave)="onMouseLeave($event)">
         <div class="pimp" [class.active]="isActive"></div>
     </div>

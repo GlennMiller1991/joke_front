@@ -1,8 +1,8 @@
 .pimpContainer {
     position: absolute;
     inset: 0;
+    z-index: 2;
     transform-origin: center;
-    z-index: 2;    
 }
 
 .pimp {
@@ -15,6 +15,7 @@
     top: 50%;
     transform: translate(-50%, -50%)
 }
+
 
 .active {
     background: var(--active-color);

@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { ButtonComponent } from "../button/button.component";
-import { NgClass } from "@angular/common";
+import { NgClass, NgStyle } from "@angular/common";
+import { Angle, AngleUnits, IPoint2, Point } from "@fbltd/math";
 
 @Component({
     standalone: true,
@@ -8,15 +9,16 @@ import { NgClass } from "@angular/common";
     templateUrl: './rotated-button.component.html',
     styleUrl: './rotated-button.component.css',
     imports: [
-        ButtonComponent, NgClass,
+        ButtonComponent, NgClass, NgStyle
     ]
 })
-export class RotatedButtonComponent extends ButtonComponent{
-    angle = 0
+export class RotatedButtonComponent extends ButtonComponent {
+    _angle = 0
 
     override onMouseDown(event: Event) {
         event.stopPropagation()
         super.onMouseDown(event)
+        this.onMouseMove(event as MouseEvent)
     }
 
     override onMouseLeave(event: Event): void {
@@ -30,6 +32,13 @@ export class RotatedButtonComponent extends ButtonComponent{
         const node = event.currentTarget as HTMLDivElement
         if (!node) return
         const rect = node.getBoundingClientRect()
-        
+        const center: IPoint2 = [(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2]
+        const mp: IPoint2 = [event.clientX, event.clientY]
+        const dif = Point.dif(mp, center)
+        this._angle = Angle.toDeg(Math.atan2(dif[1], dif[0]))
+    }
+
+    get angle() {
+        return Angle.toCSS(this._angle, AngleUnits.Deg)
     }
 }   
