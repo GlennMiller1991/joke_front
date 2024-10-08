@@ -24,7 +24,12 @@ export class RotatedButtonComponent extends ButtonComponent{
         super.onMouseLeave(event)
     }
 
-    onMouseMove(event: MouseEvent) {
 
+    onMouseMove(event: MouseEvent) {
+        if (!this.isActive) return
+        const node = event.currentTarget as HTMLDivElement
+        if (!node) return
+        const rect = node.getBoundingClientRect()
+        
     }
 }   
