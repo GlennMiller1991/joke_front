@@ -4,7 +4,7 @@ import { Stage } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
-import { Color } from '@fbltd/math';
+import { Color, identityMatrix3d, Matrix3d } from '@fbltd/math';
 
 @Component({
   standalone: true,
@@ -46,9 +46,11 @@ export class IntroComponent implements OnDestroy {
 
 
       const plane = new Plane({ origin: [-0.5, -1], width: 1, height: 1 }, new Color(0.1, 0.3, 0.7))
-      const planeObject = new StageGroup(p, plane)
-      planeObject.init()
-      this.stage.addObject(planeObject)
+      const group = new StageGroup(p, plane)
+      group.transform = Matrix3d.multiply(identityMatrix3d, [1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0, 0])
+      group.init()
+
+      this.stage.addObject(group)
 
 
       this.resizeObserver = new ResizeObserver(this.onResize)

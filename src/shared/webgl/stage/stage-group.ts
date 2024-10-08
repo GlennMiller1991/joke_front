@@ -1,10 +1,10 @@
-import { identityMatrix, IMatrix2d, Matrix2d } from '@fbltd/math';
+import { identityMatrix3d, IMatrix3d } from '@fbltd/math';
 import { WebglProgram } from '../webgl-program';
 import { IFigure } from './contracts';
 
 export class StageGroup implements IFigure {
   vao: WebGLVertexArrayObject | null = null
-  transform: IMatrix2d = identityMatrix
+  transform = identityMatrix3d
 
   constructor(private program: WebglProgram, public readonly figure: IFigure) {
 
@@ -21,7 +21,7 @@ export class StageGroup implements IFigure {
   init() {
     this.vao = this.program.createVertexArray()
     if (!this.isReady) return
-    this.allocateVertexes('a_position', this.vertexes, 2)
+    this.allocateVertexes('a_position', this.transformVertexes(), 3)
     this.allocateVertexes('a_color', this.colors, 3)
   }
 
@@ -35,7 +35,7 @@ export class StageGroup implements IFigure {
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
   }
 
-  transformVertexes(transform: IMatrix2d): IFigure['vertexes'] {
+  transformVertexes(transform = this.transform): IFigure['vertexes'] {
     return this.figure.transformVertexes(transform)
   }
 
@@ -53,6 +53,6 @@ export class StageGroup implements IFigure {
   }
 
   draw() {
-    
+
   }
 }

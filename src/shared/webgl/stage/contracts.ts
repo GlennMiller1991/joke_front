@@ -1,4 +1,4 @@
-import { IMatrix2d, IPoint2 } from '@fbltd/math';
+import {IMatrix3d, IPoint2 } from '@fbltd/math';
 
 export type IRect = {
   width: number,
@@ -13,5 +13,5 @@ export interface IFigure {
 
   get vertexesQty(): number
 
-  transformVertexes(transform: IMatrix2d): IFigure['vertexes']
+  transformVertexes(transform: IMatrix3d): IFigure['vertexes']
 }
