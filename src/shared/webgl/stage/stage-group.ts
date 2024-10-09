@@ -1,6 +1,7 @@
 import { identityMatrix3d, IMatrix3d } from '@fbltd/math';
 import { WebglProgram } from '../webgl-program';
 import { IFigure } from './contracts';
+import { SpaceConverter } from '../converter';
 
 export class StageGroup implements IFigure {
   vao: WebGLVertexArrayObject | null = null
@@ -23,6 +24,7 @@ export class StageGroup implements IFigure {
     if (!this.isReady) return
     this.allocateVertexes('a_position', this.transformVertexes(), 3)
     this.allocateVertexes('a_color', this.colors, 3)
+    this.allocateTransform()
   }
 
   allocateVertexes(name: string, vertexes: Array<number>, size: number) {
@@ -33,6 +35,11 @@ export class StageGroup implements IFigure {
     this.gl.bindVertexArray(this.vao)
     this.gl.enableVertexAttribArray(attrLocation);
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
+  }
+
+  allocateTransform() {
+    const location = this.gl.getUniformLocation(this.program.program!, "model_matrix")
+    this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(this.transform)))
   }
 
   transformVertexes(transform = this.transform): IFigure['vertexes'] {

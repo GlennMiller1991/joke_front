@@ -26,39 +26,39 @@ export class IntroComponent implements OnDestroy {
   stage = new Stage()
 
   constructor() {
-    // afterNextRender(async () => {
-    //   this.canvas = this.canvasRef.nativeElement
-    //   this.parent = this.canvas.parentElement!
-    //   this.canvas.style.background = 'inherit'
-    //   if (!this.parent) return
-    //   this.gl = this.canvas.getContext('webgl2')!
-    //   if (!this.gl) return
+    afterNextRender(async () => {
+      this.canvas = this.canvasRef.nativeElement
+      this.parent = this.canvas.parentElement!
+      this.canvas.style.background = 'inherit'
+      if (!this.parent) return
+      this.gl = this.canvas.getContext('webgl2')!
+      if (!this.gl) return
 
-    //   const p = new WebglProgram(this.gl)
+      const p = new WebglProgram(this.gl)
 
-    //   let [fragment, vertex] = await Promise.all([
-    //     request<string>('/main-page/shaders/fragment.glsl'),
-    //     request<string>('/main-page/shaders/vertex.glsl'),
-    //   ])
+      let [fragment, vertex] = await Promise.all([
+        request<string>('/main-page/shaders/fragment.glsl'),
+        request<string>('/main-page/shaders/vertex.glsl'),
+      ])
 
-    //   if (!fragment.data || !vertex.data) return
-    //   p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
-    //   p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
-    //   p.build()
-    //   if (!p.isOk) return
-
-
-    //   const plane = new Plane({ origin: [0, 0], width: .2, height: .2 }, new Color(0.1, 0.3, 0.7))
-    //   const group = new StageGroup(p, plane)
-    //   group.transform = Matrix3d.multiply(identityMatrix3d, [1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.1, 0])
-    //   group.init()
-
-    //   this.stage.addObject(group)
+      if (!fragment.data || !vertex.data) return
+      p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
+      p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
+      p.build()
+      if (!p.isOk) return
 
 
-    //   this.resizeObserver = new ResizeObserver(this.onResize)
-    //   this.resizeObserver.observe(this.canvas.parentElement!)
-    // })
+      const plane = new Plane({ origin: [0, 0], width: .2, height: .2 }, new Color(0.1, 0.3, 0.7))
+      const group = new StageGroup(p, plane)
+      group.transform = Matrix3d.multiply(identityMatrix3d, [2, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.1, 0])
+      group.init()
+
+      this.stage.addObject(group)
+
+
+      this.resizeObserver = new ResizeObserver(this.onResize)
+      this.resizeObserver.observe(this.canvas.parentElement!)
+    })
   }
 
   get isReady() {
