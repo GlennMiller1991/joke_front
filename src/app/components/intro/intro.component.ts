@@ -50,7 +50,6 @@ export class IntroComponent implements OnDestroy {
 
       const plane = new Plane({ origin: [0, 0], width: .2, height: .2 }, new Color(0.1, 0.3, 0.7))
       const group = new StageGroup(p, plane)
-      group.transform = Matrix3d.multiply(identityMatrix3d, [2, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.1, 0])
       group.init()
 
       this.stage.addObject(group)
@@ -85,11 +84,18 @@ export class IntroComponent implements OnDestroy {
   }
 
   draw() {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT)
-    const primitiveType = this.gl.TRIANGLES;
-    const offset = 0;
-    const count = this.stage.vertexesQty;
-    this.gl.drawArrays(primitiveType, offset, count);
+    window.requestAnimationFrame(() => {
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+
+      this.stage.figures.forEach((group) => {
+        group.transform = Matrix3d.multiply(group.transform, [1, 0, 0, 0, 1, 0, 0, 0, 1, -0.001, 0.001, 0])
+        group.allocateTransform()
+        group.draw()
+      })
+
+
+      // this.draw()
+    })
   }
 
 }

@@ -22,9 +22,16 @@ export class StageGroup implements IFigure {
   init() {
     this.vao = this.program.createVertexArray()
     if (!this.isReady) return
-    this.allocateVertexes('a_position', this.transformVertexes(), 3)
+    this.allocateVertexes('a_position', this.vertexes, 3)
     this.allocateVertexes('a_color', this.colors, 3)
     this.allocateTransform()
+  }
+
+  draw() {
+    const primitiveType = this.gl.TRIANGLES;
+    const offset = 0;
+    const count = this.vertexesQty;
+    this.gl.drawArrays(primitiveType, offset, count);
   }
 
   allocateVertexes(name: string, vertexes: Array<number>, size: number) {
@@ -59,7 +66,4 @@ export class StageGroup implements IFigure {
     return this.figure.vertexesQty
   }
 
-  draw() {
-
-  }
 }
