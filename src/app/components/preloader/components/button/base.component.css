@@ -12,6 +12,12 @@ button {
     align-items: center;
 }
 
+button > span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .active {
     background: linear-gradient(-185deg, #131313, #444245);
     box-shadow: inset -2px -2px 0px #5e5e5e,

@@ -1,3 +1,5 @@
+@import 'material-icons/iconfont/material-icons.css';
+
 :root {
     --dark-primary: rgb(0, 0, 0);
 }
@@ -10,6 +12,8 @@
 
 html, body {
     height: 100%;
+    background: linear-gradient(90deg, rgb(46, 44, 45),
+    rgba(66, 64, 67, 1) 100%);
 }
 
 .block {

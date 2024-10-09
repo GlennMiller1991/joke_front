@@ -34,7 +34,7 @@ export class RotatedButtonComponent extends ButtonComponent {
         const rect = node.getBoundingClientRect()
         const center: IPoint2 = [(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2]
         const mp: IPoint2 = [event.clientX, event.clientY]
-        this._angle = Angle.ofPoint(Point.dif(mp, center))
+        this._angle = Angle.ofPoint(Point.dif(mp, center), false)
     }
 
     get angle() {

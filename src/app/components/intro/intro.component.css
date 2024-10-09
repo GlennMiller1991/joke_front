@@ -15,3 +15,11 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
+.player {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-evenly;
+    padding: 1em;
+}
