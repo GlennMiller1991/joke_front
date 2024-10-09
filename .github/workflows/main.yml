@@ -53,5 +53,7 @@ jobs:
                then
                 docker rm ${{ vars.DOCKER_NAME }}
             fi
+
+            sleep 5
             
             docker run --env port=${{ secrets.APP_PORT }} --name ${{ vars.DOCKER_NAME }} -p ${{ secrets.DOCKER_MAPPED_PORT }}:${{ secrets.APP_PORT }} -d --rm ${{ vars.DOCKER_NAME }}
