@@ -1,0 +1,10 @@
+.player {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-evenly;
+    padding: 1em;
+}

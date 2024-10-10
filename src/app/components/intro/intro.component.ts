@@ -4,17 +4,18 @@ import { Stage } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
-import { Color, identityMatrix3d, Matrix3d } from '@fbltd/math';
+import { Color, Matrix3d } from '@fbltd/math';
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
-
+import { PlayerComponent } from '../player/player.component';
 @Component({
   standalone: true,
   selector: 'intro-component',
   templateUrl: './intro.component.html',
   styleUrl: './intro.component.css',
-  imports: [ButtonComponent, RotatedButtonComponent]
+  imports: [PlayerComponent]
 })
+
 export class IntroComponent implements OnDestroy {
   @ViewChild('canvas')
   canvasRef!: ElementRef<HTMLCanvasElement>

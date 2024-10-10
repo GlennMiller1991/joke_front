@@ -1,5 +1,5 @@
 import { NgClass, NgStyle } from "@angular/common";
-import { afterNextRender, afterRender, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 
 @Component({
     standalone: true,
@@ -15,17 +15,24 @@ export class ButtonComponent {
     @Input() size: string = '7em'
     @Input() isDisabled: boolean = false
     @Input() isActive = false
+    localActivity = false
     @ViewChild('button') buttonRef!: ElementRef<HTMLButtonElement>
-
+    @Output() onPress = new EventEmitter<'mousedown' | 'mouseup'>()
 
     onMouseDown(event: Event) {
         if (this.isDisabled) return
-        this.isActive = true
+        this.localActivity = true
+        this.onPress.emit('mousedown')
     }
 
     onMouseLeave(event: Event) {
         if (this.isDisabled) return
-        this.isActive = false
+        this.localActivity = false
+        this.onPress.emit('mouseup')
+    }
+
+    get totalActivity() {
+        return this.localActivity || this.isActive
     }
 
 
@@ -33,7 +40,7 @@ export class ButtonComponent {
         return {
             flush: this.baseType === 'flush',
             elevated: this.baseType === 'elevated',
-            active: this.isActive
+            active: this.totalActivity
         }
     }
 
