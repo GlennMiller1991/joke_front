@@ -27,7 +27,7 @@ export class IntroComponent implements OnDestroy {
   stage = new Stage()
 
   constructor() {
-    afterNextRender(async () => {
+    /** 
       this.canvas = this.canvasRef.nativeElement
       this.parent = this.canvas.parentElement!
       this.canvas.style.background = 'inherit'
@@ -58,7 +58,8 @@ export class IntroComponent implements OnDestroy {
 
       this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.canvas.parentElement!)
-    })
+    // })
+    */
   }
 
   get isReady() {
