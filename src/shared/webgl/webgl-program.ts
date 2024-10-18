@@ -1,6 +1,8 @@
 import { FAILURE, IFailure, SUCCESS } from '../utils';
 import { IShaderType } from './contracts';
 import { validateType } from '../common/validate-type';
+import { SpaceConverter } from './converter';
+import { IMatrix3d } from '@fbltd/math';
 
 export class WebglProgram {
   _vertexShader: WebGLShader | undefined
@@ -56,7 +58,7 @@ export class WebglProgram {
   }
 
   applySettings() {
-    this.gl.clearColor(0.6, 0.6, 0.8, 1.0)
+    this.gl.clearColor(0, 0, 0, 0)
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.cullFace(this.gl.BACK);
     this.gl.frontFace(this.gl.CW);
@@ -72,6 +74,11 @@ export class WebglProgram {
     this.gl.bindVertexArray(vao)
     this.gl.enableVertexAttribArray(attrLocation);
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
+  }
+
+  allocateTransform(matrix: IMatrix3d) {
+    const location = this.gl.getUniformLocation(this.program!, "model_matrix")
+    this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(matrix)))
   }
 
   createVertexArray() {

@@ -1,11 +1,11 @@
-import { identityMatrix3d, IMatrix3d } from '@fbltd/math';
+import { Angle, identityMatrix3d, IMatrix3d, IPoint2, Matrix3d } from '@fbltd/math';
 import { WebglProgram } from '../webgl-program';
 import { IFigure } from './contracts';
 import { SpaceConverter } from '../converter';
 
 export class StageGroup implements IFigure {
   vao: WebGLVertexArrayObject | null = null
-  transform = identityMatrix3d
+  worldMatrix = identityMatrix3d
 
   constructor(private program: WebglProgram, public readonly figure: IFigure) {
 
@@ -44,12 +44,13 @@ export class StageGroup implements IFigure {
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
   }
 
-  allocateTransform() {
+  allocateTransform(transform: IMatrix3d = identityMatrix3d) {
+    transform = Matrix3d.multiply(this.worldMatrix, transform)
     const location = this.gl.getUniformLocation(this.program.program!, "model_matrix")
-    this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(this.transform)))
+    this.gl.uniformMatrix4fv(location, true, new Float32Array(SpaceConverter.matrix3toPerspective(transform)))
   }
 
-  transformVertexes(transform = this.transform): IFigure['vertexes'] {
+  transformVertexes(transform = this.worldMatrix): IFigure['vertexes'] {
     return this.figure.transformVertexes(transform)
   }
 

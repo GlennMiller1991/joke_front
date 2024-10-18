@@ -4,7 +4,7 @@ import { Stage } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
-import { Color, Matrix3d } from '@fbltd/math';
+import { Angle, Color, IPoint3, Matrix3d } from '@fbltd/math';
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
 import { PlayerComponent } from '../player/player.component';
@@ -27,7 +27,8 @@ export class IntroComponent implements OnDestroy {
   stage = new Stage()
 
   constructor() {
-    /** 
+
+    afterNextRender(async () => {
       this.canvas = this.canvasRef.nativeElement
       this.parent = this.canvas.parentElement!
       this.canvas.style.background = 'inherit'
@@ -49,7 +50,7 @@ export class IntroComponent implements OnDestroy {
       if (!p.isOk) return
 
 
-      const plane = new Plane({ origin: [0, 0], width: .2, height: .2 }, new Color(0.1, 0.3, 0.7))
+      const plane = new Plane({ origin: [-0.05, -0.05], width: 0.1, height: 0.1 }, new Color(0.1, 0.3, 0.7))
       const group = new StageGroup(p, plane)
       group.init()
 
@@ -58,9 +59,9 @@ export class IntroComponent implements OnDestroy {
 
       this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.canvas.parentElement!)
-    // })
-    */
+    })
   }
+
 
   get isReady() {
     return this.canvas && this.parent && this.gl
@@ -85,18 +86,37 @@ export class IntroComponent implements OnDestroy {
     this.resizeObserver = null as any
   }
 
+  i = 0
+  r = 1
+
+  circleEquation = (i = this.i): IPoint3 => {
+    i = Angle.toRad(i)
+    return [
+      Math.sin(i) * this.r,
+      Math.cos(i) * this.r,
+      0
+    ]
+  }
+
   draw() {
     window.requestAnimationFrame(() => {
       this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
+      const camera = this.stage.camera
+      // camera.lookAt([1, , 0])
+      console.log(this.circleEquation())
+      camera.lookAt(this.circleEquation())
       this.stage.figures.forEach((group) => {
-        group.transform = Matrix3d.multiply(group.transform, [1, 0, 0, 0, 1, 0, 0, 0, 1, -0.001, 0.001, 0])
-        group.allocateTransform()
+        group.allocateTransform(Matrix3d.invert(camera.worldMatrix))
         group.draw()
+        console.log(group.transformVertexes(Matrix3d.invert(camera.worldMatrix)))
       })
 
 
-      // this.draw()
+      setTimeout(() => {
+        this.i += 1
+        this.draw()
+      },10)
     })
   }
 

@@ -1,6 +1,7 @@
-import { Component } from "@angular/core";
+import { Component, Inject, PLATFORM_ID } from "@angular/core";
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
+import { isPlatformBrowser, NgStyle } from "@angular/common";
 
 
 type IEvent = 'mousedown' | 'mouseup'
@@ -11,13 +12,17 @@ type IEvent = 'mousedown' | 'mouseup'
     templateUrl: './player.component.html',
     styleUrl: './player.component.css',
     imports: [
-        ButtonComponent, RotatedButtonComponent,
+        ButtonComponent, RotatedButtonComponent
     ]
 })
 export class PlayerComponent {
     activeBtn: 'back' | 'forward' | 'play' | undefined = undefined
     timer: number | undefined
+    @Inject(PLATFORM_ID) platform_id!: Object
 
+    get isBrowser() {
+        return isPlatformBrowser(this.platform_id)
+    }
 
     onBack(hint: IEvent) {
         this.onActivityChange(hint, 'back')
@@ -41,6 +46,7 @@ export class PlayerComponent {
             isPlayActive: this.activeBtn === 'play'
         }
     }
+
 
     onActivityChange(hint: 'mousedown' | 'mouseup', button: NonNullable<Omit<typeof this.activeBtn, 'play'>>) {
         switch (hint) {
