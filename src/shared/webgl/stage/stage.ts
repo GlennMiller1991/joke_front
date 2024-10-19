@@ -1,24 +1,42 @@
 import { log } from 'console';
 import { IFigure, IObject } from './contracts';
 import { StageGroup } from './stage-group';
-import { Angle, AngleUnits, identityMatrix3d, IPoint2, IPoint3, Matrix3d, Point } from '@fbltd/math';
+import { Angle, AngleUnits, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matrix3d, Point } from '@fbltd/math';
 
 export class Camera {
-  worldMatrix = Matrix3d.translateIdentity(0, 0, -1)
+  worldMatrix = Matrix3d.translateIdentity(0, 0, -0.5)
+
+  get invertedWorldMatrix() {
+    return Matrix3d.invert(this.worldMatrix)
+  }
+
+  getPointInCamera(p: IPoint3) {
+    return Matrix3d.apply(this.invertedWorldMatrix, p)
+  }
 
   lookAt(worldPoint: IPoint3) {
-    let inverted = Matrix3d.invert(this.worldMatrix)
-    worldPoint = Matrix3d.apply(inverted, worldPoint)
+    let roll: number, pitch: number, yaw: number;
+    let inverted: IMatrix3d;
+    let pointInCamera: IPoint3;
 
-    let yaw = Angle.ofPoint([worldPoint[0], worldPoint[1]], false) - 90
-    let pitch = Angle.ofPoint([worldPoint[1], worldPoint[2]], false) - 90
-    console.log(pitch)
+    this.worldMatrix = Matrix3d.translateIdentity(this.worldMatrix[9], this.worldMatrix[10], this.worldMatrix[11])
 
+    // roll
+    inverted = this.invertedWorldMatrix
+    pointInCamera = this.getPointInCamera(worldPoint)
+    roll = Angle.ofPoint([pointInCamera[0], pointInCamera[1]], false) - 90
+    this.worldMatrix = Matrix3d.multiply(this.worldMatrix, Matrix3d.rotateIdentityZ(roll))
 
-    this.worldMatrix = Matrix3d.multiply(this.worldMatrix, Matrix3d.rotateIdentityZ(yaw))
-    inverted = Matrix3d.invert(this.worldMatrix)
-    pitch = Angle.ofPoint([worldPoint[1], worldPoint[2]], false) - 90
-    console.log(pitch)
+    // yaw
+    inverted = this.invertedWorldMatrix
+    pointInCamera = this.getPointInCamera(worldPoint)
+    yaw = Angle.ofPoint([pointInCamera[0], pointInCamera[2]], false) - 90
+    this.worldMatrix = Matrix3d.multiply(this.worldMatrix, Matrix3d.rotateIdentityY(yaw))
+
+    // pitch
+    inverted = this.invertedWorldMatrix
+    pointInCamera = this.getPointInCamera(worldPoint)
+    pitch = Angle.ofPoint([pointInCamera[1], pointInCamera[2]], false) - 90
     this.worldMatrix = Matrix3d.multiply(this.worldMatrix, Matrix3d.rotateIdentityX(pitch))
 
   }

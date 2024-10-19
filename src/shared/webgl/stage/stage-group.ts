@@ -47,7 +47,7 @@ export class StageGroup implements IFigure {
   allocateTransform(transform: IMatrix3d = identityMatrix3d) {
     transform = Matrix3d.multiply(this.worldMatrix, transform)
     const location = this.gl.getUniformLocation(this.program.program!, "model_matrix")
-    this.gl.uniformMatrix4fv(location, true, new Float32Array(SpaceConverter.matrix3toPerspective(transform)))
+    this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(transform)))
   }
 
   transformVertexes(transform = this.worldMatrix): IFigure['vertexes'] {
