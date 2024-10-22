@@ -76,8 +76,8 @@ export class WebglProgram {
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
   }
 
-  allocateTransform(matrix: IMatrix3d) {
-    const location = this.gl.getUniformLocation(this.program!, "model_matrix")
+  allocateTransform(matrix: IMatrix3d, name: string) {
+    const location = this.gl.getUniformLocation(this.program!, name)
     this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(matrix)))
   }
 

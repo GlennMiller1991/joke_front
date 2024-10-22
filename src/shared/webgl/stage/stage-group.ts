@@ -24,7 +24,6 @@ export class StageGroup implements IFigure {
     if (!this.isReady) return
     this.allocateVertexes('a_position', this.vertexes, 3)
     this.allocateVertexes('a_color', this.colors, 3)
-    this.allocateTransform()
   }
 
   draw() {
@@ -42,12 +41,6 @@ export class StageGroup implements IFigure {
     this.gl.bindVertexArray(this.vao)
     this.gl.enableVertexAttribArray(attrLocation);
     this.gl.vertexAttribPointer(attrLocation, size, this.gl.FLOAT, false, 0, 0)
-  }
-
-  allocateTransform(transform: IMatrix3d = identityMatrix3d) {
-    transform = Matrix3d.multiply(this.worldMatrix, transform)
-    const location = this.gl.getUniformLocation(this.program.program!, "model_matrix")
-    this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(transform)))
   }
 
   transformVertexes(transform = this.worldMatrix): IFigure['vertexes'] {

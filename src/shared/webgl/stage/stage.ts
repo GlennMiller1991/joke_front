@@ -2,6 +2,31 @@ import { log } from 'console';
 import { IFigure, IObject } from './contracts';
 import { StageGroup } from './stage-group';
 import { Angle, AngleUnits, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matrix3d, Point } from '@fbltd/math';
+import { IMatrixPerspective, SpaceConverter } from '../converter';
+import { WebglProgram } from '../webgl-program';
+
+export class Projection {
+  public depthFactor = 0
+  gl: WebGL2RenderingContext
+
+  constructor(private program: WebglProgram) {
+    this.gl = program.gl
+  }
+
+  get transform(): IMatrixPerspective {
+    return [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 1,
+      0, 0, 0, 1
+    ]
+  }
+
+  allocateTransform() {
+    const location = this.gl.getUniformLocation(this.program.program!, "projection_matrix")
+    this.gl.uniformMatrix4fv(location, false, new Float32Array(this.transform))
+  }
+}
 
 export class Camera {
   worldMatrix = Matrix3d.translateIdentity(0, 0, -0.5)
@@ -44,7 +69,15 @@ export class Camera {
 
 export class Stage {
   figures: StageGroup[] = []
-  camera: Camera = new Camera
+  program: WebglProgram
+  projection: Projection
+  camera: Camera
+
+  constructor(program: WebglProgram) {
+    this.program = program
+    this.projection = new Projection(this.program)
+    this.camera = new Camera()
+  }
 
   addObject(figure: typeof this.figures[0]) {
     this.figures.push(figure)

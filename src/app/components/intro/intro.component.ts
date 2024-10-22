@@ -48,8 +48,8 @@ export class IntroComponent implements OnDestroy {
   parent!: HTMLElement
   canvas!: HTMLCanvasElement
   gl!: WebGL2RenderingContext
-  program!: WebGLProgram
-  stage = new Stage()
+  program!: WebglProgram
+  stage!: Stage
 
   constructor() {
 
@@ -61,7 +61,7 @@ export class IntroComponent implements OnDestroy {
       this.gl = this.canvas.getContext('webgl2')!
       if (!this.gl) return
 
-      const p = new WebglProgram(this.gl)
+      this.program = new WebglProgram(this.gl)
 
       let [fragment, vertex] = await Promise.all([
         request<string>('/main-page/shaders/fragment.glsl'),
@@ -69,14 +69,15 @@ export class IntroComponent implements OnDestroy {
       ])
 
       if (!fragment.data || !vertex.data) return
-      p.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
-      p.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
-      p.build()
-      if (!p.isOk) return
+      this.program.buildInShader(vertex.data, this.gl.VERTEX_SHADER)
+      this.program.buildInShader(fragment.data, this.gl.FRAGMENT_SHADER)
+      this.program.build()
+      if (!this.program.isOk) return
 
 
+      this.stage = new Stage(this.program)
       const plane = new Plane({ origin: [-0.5, -0.5], width: .5, height: .5 }, new Color(0.1, 0.3, 0.7))
-      const group = new StageGroup(p, plane)
+      const group = new StageGroup(this.program, plane)
       group.init()
 
       this.stage.addObject(group)
@@ -131,7 +132,7 @@ export class IntroComponent implements OnDestroy {
   }
 
   i = 0
-  r = 1
+  r = 5
   z = 0
   play = 0
   fastCoef = 10
@@ -149,18 +150,24 @@ export class IntroComponent implements OnDestroy {
     window.requestAnimationFrame(() => {
       this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
+      const projection = this.stage.projection
       const camera = this.stage.camera
+
+      this.i += this.play
+      this.z += 0.0001
+      this.r -= 0.0005
+
       camera.lookAt(this.circleEquation())
+
+      projection.allocateTransform();
+      this.program.allocateTransform(Matrix3d.invert(this.stage.camera.worldMatrix), 'camera_matrix')
+
       this.stage.figures.forEach((group) => {
-        group.allocateTransform(Matrix3d.invert(camera.worldMatrix))
         group.draw()
       })
 
       if (this.play) {
-        this.animationQueue.push(() => {
-          this.i += this.play
-          this.draw()
-        })
+        this.animationQueue.push(() => this.draw())
       }
 
 
