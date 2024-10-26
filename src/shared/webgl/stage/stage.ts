@@ -29,7 +29,7 @@ export class Projection {
 }
 
 export class Camera {
-  worldMatrix = Matrix3d.translateIdentity(0, 0, -0.5)
+  worldMatrix = Matrix3d.translateIdentity(0, 0, -2)
 
   get invertedWorldMatrix() {
     return Matrix3d.invert(this.worldMatrix)

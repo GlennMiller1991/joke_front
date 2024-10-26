@@ -59,8 +59,8 @@ export class WebglProgram {
 
   applySettings() {
     this.gl.clearColor(0, 0, 0, 0)
-    this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.BACK);
+    // this.gl.enable(this.gl.CULL_FACE);
+    // this.gl.cullFace(this.gl.NONE);
     this.gl.frontFace(this.gl.CW);
   }
 

@@ -1,14 +1,20 @@
-import { Angle, identityMatrix3d, IMatrix3d, IPoint2, Matrix3d } from '@fbltd/math';
+import { Angle, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matrix3d } from '@fbltd/math';
 import { WebglProgram } from '../webgl-program';
 import { IFigure } from './contracts';
 import { SpaceConverter } from '../converter';
 
 export class StageGroup implements IFigure {
+  key = String(Math.random())
   vao: WebGLVertexArrayObject | null = null
   worldMatrix = identityMatrix3d
+  figures: IFigure[] = []
 
-  constructor(private program: WebglProgram, public readonly figure: IFigure) {
+  constructor(private program: WebglProgram) {
 
+  }
+
+  addFigures(...figures: Array<IFigure>) {
+    this.figures.push(...figures)
   }
 
   get gl() {
@@ -44,20 +50,32 @@ export class StageGroup implements IFigure {
   }
 
   transformVertexes(transform = this.worldMatrix): IFigure['vertexes'] {
-    return this.figure.transformVertexes(transform)
+    return this.figures.reduce((acc, f) => {
+      acc.push(...f.transformVertexes(transform))
+      return acc
+    }, [] as number[])
   }
 
 
   get vertexes() {
-    return this.figure.vertexes
+    return this.figures.reduce((acc, f) => {
+      acc.push(...f.vertexes)
+      return acc
+    }, [] as number[])
   }
 
   get colors() {
-    return this.figure.colors
+    return this.figures.reduce((acc, f) => {
+      acc.push(...f.colors)
+
+      return acc
+    }, [] as number[])
   }
 
   get vertexesQty() {
-    return this.figure.vertexesQty
+    return this.figures.reduce((acc, f) => {
+      return acc + f.vertexesQty
+    }, 0)
   }
 
 }

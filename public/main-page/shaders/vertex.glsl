@@ -11,5 +11,7 @@ out vec3 color;
 
 void main() {
     color = a_color;
-    gl_Position = projection_matrix * camera_matrix * a_position;
+    vec4 t =  camera_matrix * a_position;
+    t = projection_matrix * t;
+    gl_Position =  t;
 }

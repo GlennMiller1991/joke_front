@@ -4,7 +4,7 @@ import { Stage } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
-import { Angle, Color, IPoint3, Matrix3d } from '@fbltd/math';
+import { Angle, Color, IPoint3, Matrix3d, identityMatrix3d } from '@fbltd/math';
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
 import { PlayerComponent } from '../player/player.component';
@@ -76,15 +76,20 @@ export class IntroComponent implements OnDestroy {
 
 
       this.stage = new Stage(this.program)
-      const plane = new Plane({ origin: [-0.5, -0.5], width: .5, height: .5 }, new Color(0.1, 0.3, 0.7))
-      const group = new StageGroup(this.program, plane)
-      group.init()
+      const plane1 = Plane.ofRect3({ origin: [-0, -0, -0], width: .5, height: .5, depth: .5 }, new Color(0.1, 0.3, 0.7))
+      const plane2 = Plane.ofRect3({ origin: [-0, -0, -0], width: -.5, height: .5, depth: .5 }, new Color(0.1, 0.4, 0.7))
+      const plane3 = Plane.ofRect3({origin: [-1, -1, -1], width: 2, height: 0, depth: 2}, new Color(1, 1, 1))
+      const group1 = new StageGroup(this.program)
+      group1.addFigures(plane1, plane2, plane3)
+      group1.init()
 
-      this.stage.addObject(group)
+      this.stage.addObject(group1)
 
 
       this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.canvas.parentElement!)
+
+      document.addEventListener('keypress', this.onKeyBoard)
     })
   }
 
@@ -126,6 +131,40 @@ export class IntroComponent implements OnDestroy {
     this.gl.lineWidth(10)
   }
 
+  onKeyBoard = (event: KeyboardEvent) => {
+    const camera = this.stage.camera
+    let m = identityMatrix3d
+    switch (event.key) {
+      case 'q':
+        m = Matrix3d.rotateZ(m, 1)
+        break
+      case 'e':
+        m = Matrix3d.rotateZ(m, -1)
+        break
+      case 'w':
+        m = Matrix3d.translateZ(m, 0.01)
+        break
+      case 's':
+        m = Matrix3d.translateZ(m, -0.01)
+        break
+      case 'a':
+        m = Matrix3d.rotateY(m, -1)
+        break
+      case 'd':
+        m = Matrix3d.rotateY(m, 1)
+        break
+      case 'r':
+        m = Matrix3d.rotateX(m, 1)
+        break
+      case 't':
+        m = Matrix3d.rotateX(m, -1)
+        break
+    }
+
+    camera.worldMatrix = Matrix3d.multiply(camera.worldMatrix, m)
+    this.animationQueue.push(this.draw.bind(this))
+  }
+
   ngOnDestroy() {
     this.resizeObserver?.disconnect()
     this.resizeObserver = null as any
@@ -147,31 +186,18 @@ export class IntroComponent implements OnDestroy {
   }
 
   draw() {
-    window.requestAnimationFrame(() => {
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
-      const projection = this.stage.projection
-      const camera = this.stage.camera
+    const projection = this.stage.projection
+    const camera = this.stage.camera
 
-      this.i += this.play
-      this.z += 0.0001
-      this.r -= 0.0005
+    projection.allocateTransform();
+    this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
-      camera.lookAt(this.circleEquation())
-
-      projection.allocateTransform();
-      this.program.allocateTransform(Matrix3d.invert(this.stage.camera.worldMatrix), 'camera_matrix')
-
-      this.stage.figures.forEach((group) => {
-        group.draw()
-      })
-
-      if (this.play) {
-        this.animationQueue.push(() => this.draw())
-      }
-
-
+    this.stage.figures.forEach((group) => {
+      group.draw()
     })
+
   }
 
 }
