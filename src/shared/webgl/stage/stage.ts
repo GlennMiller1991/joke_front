@@ -11,8 +11,8 @@ export class Projection {
   gl: WebGL2RenderingContext
 
   angleOfView = 90
-  far = 10
-  near = 1
+  far = 50
+  near = 0.1
   aspectRatio = 1
 
   constructor(private program: WebglProgram) {

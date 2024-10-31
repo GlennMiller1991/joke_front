@@ -31,6 +31,11 @@ export class AnimationQueue {
     this.queue = []
     queue.forEach(f => f())
   }
+
+  clear() {
+    this.queue = []
+    this.rafId && window.cancelAnimationFrame(this.rafId)
+  }
 }
 
 
@@ -78,8 +83,9 @@ export class IntroComponent implements OnDestroy {
 
 
       this.stage = new Stage(this.program)
-      const cube = new Cube({ origin: [-0.25, -0.25, 2], width: .5, depth: .5, height: .5 }, new Color(0.6, 0.6, 1))
+      const cube = new Cube({ origin: [-0.25, -0.25, -0.25], width: .5, depth: .5, height: .5 }, new Color(0.6, 0.6, 1))
       const group1 = new StageGroup(this.program)
+      group1.worldMatrix = Matrix3d.translateIdentity(0, 0, 5)
       group1.addFigures(cube)
       group1.init()
 
@@ -111,7 +117,11 @@ export class IntroComponent implements OnDestroy {
     }
 
     if (this.play && !play) {
-      this.draw()
+      console.log('play')
+      this.animationQueue.push(this.draw.bind(this))
+    } else if (!this.play) {
+      console.log('clear')
+      this.animationQueue.clear()
     }
   }
 
@@ -122,17 +132,13 @@ export class IntroComponent implements OnDestroy {
   onResize = () => {
     const parent = this.canvasRef.nativeElement.parentElement!
     const rect = parent.getBoundingClientRect()
-    const max = Math.min(rect.width, rect.height)
+    const max = Math.max(rect.width, rect.height)
     this.canvas.width = max
     this.canvas.height = max
     this.canvas.style.width = `${max}px`
     this.canvas.style.height = `${max}px`
     this.gl.viewport(0, 0, max, max);
     this.gl.lineWidth(10)
-
-
-    this.stage.camera.moveTo([0, 0, -1])
-    this.animationQueue.push(this.draw.bind(this))
   }
 
   onKeyBoard = (event: KeyboardEvent) => {
@@ -183,7 +189,7 @@ export class IntroComponent implements OnDestroy {
     }
 
     camera.worldMatrix = Matrix3d.multiply(camera.worldMatrix, m)
-    // this.animationQueue.push(this.draw.bind(this))
+    this.animationQueue.push(this.draw.bind(this))
   }
 
   ngOnDestroy() {
@@ -193,7 +199,7 @@ export class IntroComponent implements OnDestroy {
 
   step = 0.005
   direction = 1
-  i = 0.1
+  i = 1
   r = 10
   z = -1
   play = 0
@@ -219,12 +225,11 @@ export class IntroComponent implements OnDestroy {
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
     this.stage.figures.forEach((group) => {
-      // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
-      // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
-      // group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, this.i)
-      // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
+      group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
+      group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
+      group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
+     
       this.program.allocateTransform(group.worldMatrix, 'model_matrix');
-      // console.log(group.worldMatrix[11])
       group.draw()
     })
 
