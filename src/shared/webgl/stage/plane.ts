@@ -5,7 +5,7 @@ import { Vertex } from './vertex';
 import { SpaceConverter } from '../converter';
 
 export class Plane implements IFigure {
-  private children: [Triangle, Triangle] | Plane[]
+  public children: [Triangle, Triangle] | Plane[]
   private color!: Color
 
   constructor(p1: IPoint3, p2: IPoint3, p3: IPoint3, p4: IPoint3, color?: typeof this.color) {
@@ -40,7 +40,7 @@ export class Plane implements IFigure {
       Point.sum(rect.origin, [rect.width, rect.height, 0]),
       Point.sum(rect.origin, [0, 0, rect.depth]),
       Point.sum(rect.origin, [rect.width, rect.height, rect.depth]),
-      color
+      color,
     )
   }
 

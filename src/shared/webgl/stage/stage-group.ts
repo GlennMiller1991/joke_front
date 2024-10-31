@@ -33,7 +33,7 @@ export class StageGroup implements IFigure {
   }
 
   draw() {
-    const primitiveType = this.gl.TRIANGLES;
+    const primitiveType = this.gl.LINE_STRIP;
     const offset = 0;
     const count = this.vertexesQty;
     this.gl.drawArrays(primitiveType, offset, count);

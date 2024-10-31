@@ -8,6 +8,7 @@ import { Angle, Color, IPoint3, Matrix3d, identityMatrix3d } from '@fbltd/math';
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
 import { PlayerComponent } from '../player/player.component';
+import { Cube } from '../../../shared/webgl/stage/cube';
 
 
 export class AnimationQueue {
@@ -26,8 +27,9 @@ export class AnimationQueue {
   }
 
   go() {
-    this.queue.forEach(f => f())
+    const queue = this.queue
     this.queue = []
+    queue.forEach(f => f())
   }
 }
 
@@ -76,11 +78,9 @@ export class IntroComponent implements OnDestroy {
 
 
       this.stage = new Stage(this.program)
-      const plane1 = Plane.ofRect3({ origin: [-0, -0, -0], width: .5, height: .5, depth: .5 }, new Color(0.1, 0.3, 0.7))
-      const plane2 = Plane.ofRect3({ origin: [-0, -0, -0], width: -.5, height: .5, depth: .5 }, new Color(0.1, 0.4, 0.7))
-      const plane3 = Plane.ofRect3({origin: [-1, -1, -1], width: 2, height: 0, depth: 2}, new Color(1, 1, 1))
+      const cube = new Cube({ origin: [-0.25, -0.25, 2], width: .5, depth: .5, height: .5 }, new Color(0.6, 0.6, 1))
       const group1 = new StageGroup(this.program)
-      group1.addFigures(plane1, plane2, plane3)
+      group1.addFigures(cube)
       group1.init()
 
       this.stage.addObject(group1)
@@ -122,13 +122,17 @@ export class IntroComponent implements OnDestroy {
   onResize = () => {
     const parent = this.canvasRef.nativeElement.parentElement!
     const rect = parent.getBoundingClientRect()
-    const max = Math.max(rect.width, rect.height)
+    const max = Math.min(rect.width, rect.height)
     this.canvas.width = max
     this.canvas.height = max
     this.canvas.style.width = `${max}px`
     this.canvas.style.height = `${max}px`
     this.gl.viewport(0, 0, max, max);
     this.gl.lineWidth(10)
+
+
+    this.stage.camera.moveTo([0, 0, -1])
+    this.animationQueue.push(this.draw.bind(this))
   }
 
   onKeyBoard = (event: KeyboardEvent) => {
@@ -142,10 +146,27 @@ export class IntroComponent implements OnDestroy {
         m = Matrix3d.rotateZ(m, -1)
         break
       case 'w':
-        m = Matrix3d.translateZ(m, 0.01)
+        // this.stage.figures.forEach((group) => {
+        //   // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
+        //   // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
+        //   group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, this.i)
+        //   console.log(group.worldMatrix[11])
+        //   // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
+        // })
+        this.stage.projection.far += this.i
+        console.log(this.stage.projection.far)
+        // m = Matrix3d.translateZ(m, 0.1)
         break
       case 's':
-        m = Matrix3d.translateZ(m, -0.01)
+        // this.stage.figures.forEach((group) => {
+        //   // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
+        //   // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
+        //   group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, -this.i)
+        //   console.log(group.worldMatrix[11])
+        //   // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
+        // })
+        this.stage.projection.far -= this.i
+        console.log(this.stage.projection.far)
         break
       case 'a':
         m = Matrix3d.rotateY(m, -1)
@@ -154,15 +175,15 @@ export class IntroComponent implements OnDestroy {
         m = Matrix3d.rotateY(m, 1)
         break
       case 'r':
-        m = Matrix3d.rotateX(m, 1)
+        m = Matrix3d.rotateX(m, -1)
         break
       case 't':
-        m = Matrix3d.rotateX(m, -1)
+        m = Matrix3d.rotateX(m, 1)
         break
     }
 
     camera.worldMatrix = Matrix3d.multiply(camera.worldMatrix, m)
-    this.animationQueue.push(this.draw.bind(this))
+    // this.animationQueue.push(this.draw.bind(this))
   }
 
   ngOnDestroy() {
@@ -170,14 +191,16 @@ export class IntroComponent implements OnDestroy {
     this.resizeObserver = null as any
   }
 
-  i = 0
-  r = 5
-  z = 0
+  step = 0.005
+  direction = 1
+  i = 0.1
+  r = 10
+  z = -1
   play = 0
   fastCoef = 10
 
-  circleEquation = (i = this.i): IPoint3 => {
-    i = Angle.toRad(i)
+  circleEquation = (): IPoint3 => {
+    const i = Angle.toRad(this.i)
     return [
       Math.cos(i) * this.r,
       Math.sin(i) * this.r,
@@ -192,11 +215,21 @@ export class IntroComponent implements OnDestroy {
     const camera = this.stage.camera
 
     projection.allocateTransform();
+    projection.allocateCopy();
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
     this.stage.figures.forEach((group) => {
+      // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
+      // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
+      // group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, this.i)
+      // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
+      this.program.allocateTransform(group.worldMatrix, 'model_matrix');
+      // console.log(group.worldMatrix[11])
       group.draw()
     })
+
+
+    this.animationQueue.push(this.draw.bind(this))
 
   }
 

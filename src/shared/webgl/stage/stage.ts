@@ -5,19 +5,38 @@ import { Angle, AngleUnits, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matri
 import { IMatrixPerspective, SpaceConverter } from '../converter';
 import { WebglProgram } from '../webgl-program';
 
+
 export class Projection {
   public depthFactor = 0
   gl: WebGL2RenderingContext
+
+  angleOfView = 90
+  far = 10
+  near = 1
+  aspectRatio = 1
 
   constructor(private program: WebglProgram) {
     this.gl = program.gl
   }
 
   get transform(): IMatrixPerspective {
+    const angle = Angle.toRad(this.angleOfView)
+    const range = 2 / (this.far - this.near)
+    const halfAngle = angle / 2
+    const f = Math.tan(Math.PI / 2 - halfAngle)
     return [
       1, 0, 0, 0,
       0, 1, 0, 0,
-      0, 0, 1, 1,
+      0, 0, (this.far + this.near) / (this.far - this.near), 1,
+      0, 0, (-2 * this.far * this.near) / (this.far - this.near), 0
+    ]
+  }
+
+  get copyMatrix(): IMatrixPerspective {
+    return [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
       0, 0, 0, 1
     ]
   }
@@ -26,10 +45,15 @@ export class Projection {
     const location = this.gl.getUniformLocation(this.program.program!, "projection_matrix")
     this.gl.uniformMatrix4fv(location, false, new Float32Array(this.transform))
   }
+
+  allocateCopy() {
+    const location = this.gl.getUniformLocation(this.program.program!, "copy_matrix")
+    this.gl.uniformMatrix4fv(location, false, new Float32Array(this.copyMatrix))
+  }
 }
 
 export class Camera {
-  worldMatrix = Matrix3d.translateIdentity(0, 0, -2)
+  worldMatrix = identityMatrix3d
 
   get invertedWorldMatrix() {
     return Matrix3d.invert(this.worldMatrix)
@@ -37,6 +61,13 @@ export class Camera {
 
   getPointInCamera(p: IPoint3) {
     return Matrix3d.apply(this.invertedWorldMatrix, p)
+  }
+
+  moveTo(worldPoint: IPoint3) {
+    this.worldMatrix = [...this.worldMatrix]
+    this.worldMatrix[9] = worldPoint[0]
+    this.worldMatrix[10] = worldPoint[1]
+    this.worldMatrix[11] = worldPoint[2]
   }
 
   lookAt(worldPoint: IPoint3) {
