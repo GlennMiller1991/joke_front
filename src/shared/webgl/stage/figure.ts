@@ -1,5 +1,5 @@
 import { Color, IMatrix3d } from "@fbltd/math";
-import { getColors, getPoints, getTransformedVertexes, getVertexes, getVertexesQty, IFigure } from "./contracts";
+import { getColors, getNormals, getPoints, getTransformedVertexes, getVertexes, getVertexesQty, IFigure } from "./contracts";
 import { surfaceNormal } from "../../../app/components/intro/intro.component";
 
 export class Figure implements IFigure {

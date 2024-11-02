@@ -1,11 +1,11 @@
 import { Color, IMatrix2d, IMatrix3d, IPoint3, Point } from '@fbltd/math';
-import { IFigure, IRect2, IRect3 } from './contracts';
+import { IFigure, IRect2, IRect3, ISurface } from './contracts';
 import { Triangle } from './triangle';
 import { Vertex } from './vertex';
 import { SpaceConverter } from '../converter';
 import { Figure } from './figure';
 
-export class Plane extends Figure {
+export class Plane extends Figure implements ISurface {
   declare children: [Triangle, Triangle]
 
   constructor(p1: IPoint3, p2: IPoint3, p3: IPoint3, p4: IPoint3, color?: Color, parent?: IFigure) {
@@ -24,6 +24,10 @@ export class Plane extends Figure {
     )
 
     this.children = [at, bt]
+  }
+
+  get normal() {
+    return this.children[0].normal
   }
 
   static ofRect2(rect: IRect2, color?: Color) {

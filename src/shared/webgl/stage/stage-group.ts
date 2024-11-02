@@ -1,10 +1,10 @@
 import { Angle, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matrix3d } from '@fbltd/math';
 import { WebglProgram } from '../webgl-program';
-import { IFigure } from './contracts';
+import { getNormals, IFigure, ISurface, ISurfaceHolder } from './contracts';
 import { SpaceConverter } from '../converter';
 import { Figure } from './figure';
 
-export class StageGroup extends Figure {
+export class StageGroup extends Figure implements ISurfaceHolder {
   key = String(Math.random())
   vao: WebGLVertexArrayObject | null = null
   worldMatrix = identityMatrix3d
@@ -31,6 +31,11 @@ export class StageGroup extends Figure {
     if (!this.isReady) return
     this.allocateVertexes('a_position', this.vertexes, 3)
     this.allocateVertexes('a_color', this.colors, 3)
+    this.allocateVertexes('a_normal', this.normal, 3)
+  }
+
+  get normal() {
+    return getNormals(this.children as unknown as ISurface[])
   }
 
   draw() {

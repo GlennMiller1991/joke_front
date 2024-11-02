@@ -1,6 +1,6 @@
 import { afterNextRender, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { WebglProgram } from '../../../shared/webgl/webgl-program';
-import { Stage } from '../../../shared/webgl/stage/stage';
+import { Stage, Sun } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
@@ -194,7 +194,7 @@ export class IntroComponent implements OnDestroy {
   step = 0.005
   direction = 1
   i = 1
-  r = 10
+  r = 1
   z = -1
   play = 0
   fastCoef = 10
@@ -213,16 +213,22 @@ export class IntroComponent implements OnDestroy {
 
     const projection = this.stage.projection
     const camera = this.stage.camera
+    this.i += 1
+    camera.moveTo(this.circleEquation())
+    camera.lookAt([0, 0, 2])
 
     projection.allocateTransform();
     projection.allocateCopy();
+    const sun = new Sun();
+    sun.position = Matrix3d.apply(Matrix3d.translateIdentity(1, 1, 1), sun.position)
+    this.program.allocateVector(sun.position, 'absolute_light_position')
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
     this.stage.figures.forEach((group) => {
       
-      // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
-      // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
-      // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
+      group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
+      group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
+      group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
 
       this.program.allocateTransform(group.worldMatrix, 'model_matrix');
       group.draw()
@@ -235,6 +241,12 @@ export class IntroComponent implements OnDestroy {
 
 }
 
-export function surfaceNormal(p1: IPoint3, p2: IPoint3, p3: IPoint3) {
-  return Point.dotProduct(Point.dif(p2, p1), Point.dif(p3, p1))
+export function surfaceNormal(p1: IPoint3, p2: IPoint3, p3: IPoint3): IPoint3 {
+  p2 = Point.dif(p2, p1)
+  p3 = Point.dif(p3, p1)
+  return [
+    p2[0] * p3[0],
+    p2[1] * p3[1],
+    p2[2] * p3[2],
+  ]
 }

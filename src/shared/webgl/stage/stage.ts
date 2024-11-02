@@ -5,6 +5,9 @@ import { Angle, AngleUnits, identityMatrix3d, IMatrix3d, IPoint2, IPoint3, Matri
 import { IMatrixPerspective, SpaceConverter } from '../converter';
 import { WebglProgram } from '../webgl-program';
 
+export class Sun {
+  position: IPoint3 = [0, 0, 0];
+}
 
 export class Projection {
   public depthFactor = 0

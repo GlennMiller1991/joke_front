@@ -1,14 +1,18 @@
 import { Color, IMatrix3d, IPoint3, Point } from "@fbltd/math";
-import { getColors, getTransformedVertexes, getVertexes, getVertexesQty, IFigure, IRect3 } from "./contracts";
+import { getColors, getNormals, getTransformedVertexes, getVertexes, getVertexesQty, IFigure, IRect3, ISurfaceHolder } from "./contracts";
 import { Plane } from "./plane";
 import { Figure } from "./figure";
 
-export class Cube extends Figure {
+export class Cube extends Figure implements ISurfaceHolder {
     declare children: Plane[]
 
     constructor(color?: Color, parent?: IFigure) {
         super(color, parent)
 
+    }
+
+    get normal() {
+        return getNormals(this.children)
     }
 
     static ofPlanes(planes: Array<Plane>, color?: Color, parent?: IFigure) {

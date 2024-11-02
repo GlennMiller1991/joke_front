@@ -2,23 +2,27 @@
 precision lowp float;
 
 in vec4 a_position;
-in vec3 a_color;
-in vec3 a_normal;
+in vec4 a_color;
+in vec4 a_normal;
 
 uniform mat4 camera_matrix;
 uniform mat4 projection_matrix;
 uniform mat4 copy_matrix;
 uniform mat4 model_matrix;
+uniform vec3 absolute_light_position;
 
-out vec3 color;
-out vec3 normal;
+out vec4 color;
+out vec4 normal;
+out vec4 direct_light_position;
 
 void main() {
     color = a_color;
-    normal = a_normal;
-    vec4 t =  model_matrix * a_position;
-    t = camera_matrix * t;
-    t = projection_matrix * t;
-    t = copy_matrix * t;
+
+    mat4 total_matrix = projection_matrix * model_matrix * camera_matrix;
+    vec4 t = a_position;
+    t = total_matrix * t;
+    normal = total_matrix * a_normal;
+    direct_light_position = total_matrix * vec4(absolute_light_position, 1);
+
     gl_Position =  t;
 }

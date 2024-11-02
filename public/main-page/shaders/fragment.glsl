@@ -3,9 +3,12 @@ precision lowp float;
 
 out vec4 outColor;
 
-in vec3 color;
-in vec3 normal;
+in vec4 color;
+in vec4 normal;
+in vec4 direct_light_position;
 
 void main() {
-    outColor = vec4(color / 255.0, 1);
+
+    float light = dot(normal.xyz, direct_light_position.xyz);
+    outColor = vec4(color.xyz / 255.0 * light, 1);
 }

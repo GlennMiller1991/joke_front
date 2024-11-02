@@ -14,6 +14,15 @@ export type IRect3 = {
   origin: IPoint3
 }
 
+export interface ISurfaceHolder {
+  get normal(): number[]
+}
+
+export interface ISurface {
+  get normal(): IPoint3
+}
+
+
 export interface IFigure {
   parent?: IFigure
   color?: Color
@@ -67,8 +76,9 @@ export function getPoints(figures: IFigure[]) {
   }, [] as IPoint3[])
 }
 
-// export function getNormals(figures: IFigure[]) {
-//   return figures.reduce((acc, f) => {
-//     acc.push(f.normal)
-//     return acc
-//   }, [] as IPoint3[])
+export function getNormals(figures: ISurface[]) {
+  return figures.reduce((acc, f) => {
+    acc.push(...f.normal)
+    return acc
+  }, [] as number[])
+}

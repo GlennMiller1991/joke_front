@@ -1,10 +1,10 @@
 import { Color, IMatrix2d, IMatrix3d } from '@fbltd/math';
-import { getColors, IFigure } from './contracts';
+import { getColors, IFigure, ISurface } from './contracts';
 import { Vertex } from './vertex';
 import { Figure } from './figure';
 import { surfaceNormal } from '../../../app/components/intro/intro.component';
 
-export class Triangle extends Figure {
+export class Triangle extends Figure implements ISurface {
   declare children: [Vertex, Vertex, Vertex]
 
   constructor(

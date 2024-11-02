@@ -2,7 +2,7 @@ import { FAILURE, IFailure, SUCCESS } from '../utils';
 import { IShaderType } from './contracts';
 import { validateType } from '../common/validate-type';
 import { SpaceConverter } from './converter';
-import { IMatrix3d } from '@fbltd/math';
+import { IMatrix3d, IPoint3 } from '@fbltd/math';
 
 export class WebglProgram {
   _vertexShader: WebGLShader | undefined
@@ -78,6 +78,11 @@ export class WebglProgram {
   allocateTransform(matrix: IMatrix3d, name: string) {
     const location = this.gl.getUniformLocation(this.program!, name)
     this.gl.uniformMatrix4fv(location, false, new Float32Array(SpaceConverter.matrix3toPerspective(matrix)))
+  }
+
+  allocateVector(v: IPoint3, name: string) {
+    const location = this.gl.getUniformLocation(this.program!, name)
+    this.gl.uniform3fv(location, v)
   }
 
   createVertexArray() {
