@@ -4,7 +4,7 @@ import { Stage } from '../../../shared/webgl/stage/stage';
 import { Plane } from '../../../shared/webgl/stage/plane';
 import { request } from '../../../shared/network/request';
 import { StageGroup } from '../../../shared/webgl/stage/stage-group';
-import { Angle, Color, IPoint3, Matrix3d, identityMatrix3d } from '@fbltd/math';
+import { Angle, Color, IPoint3, Matrix3d, Point, identityMatrix3d } from '@fbltd/math';
 import { ButtonComponent } from "../preloader/components/button/button.component";
 import { RotatedButtonComponent } from "../preloader/components/rotated-button/rotated-button.component";
 import { PlayerComponent } from '../player/player.component';
@@ -83,9 +83,13 @@ export class IntroComponent implements OnDestroy {
 
 
       this.stage = new Stage(this.program)
-      const cube = new Cube({ origin: [-0.25, -0.25, -0.25], width: .5, depth: .5, height: .5 }, new Color(0.6, 0.6, 1))
+      const cube = Cube.ofRect({ origin: [-0.25, -0.25, -0.25], width: .5, depth: .5, height: .5 }, new Color(0.6, 0.6, 1))
+      cube.children.forEach((p) => {
+        p.color = new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255)
+      })
+
       const group1 = new StageGroup(this.program)
-      group1.worldMatrix = Matrix3d.translateIdentity(0, 0, 5)
+      group1.worldMatrix = Matrix3d.translateIdentity(0, 0, 2)
       group1.addFigures(cube)
       group1.init()
 
@@ -152,27 +156,18 @@ export class IntroComponent implements OnDestroy {
         m = Matrix3d.rotateZ(m, -1)
         break
       case 'w':
-        // this.stage.figures.forEach((group) => {
-        //   // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
-        //   // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
-        //   group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, this.i)
-        //   console.log(group.worldMatrix[11])
-        //   // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
-        // })
-        this.stage.projection.far += this.i
-        console.log(this.stage.projection.far)
-        // m = Matrix3d.translateZ(m, 0.1)
+        this.stage.figures.forEach((group) => {
+          group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
+          group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
+          group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
+        })
         break
       case 's':
-        // this.stage.figures.forEach((group) => {
-        //   // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.i)
-        //   // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.i)
-        //   group.worldMatrix = Matrix3d.translateZ(group.worldMatrix, -this.i)
-        //   console.log(group.worldMatrix[11])
-        //   // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.i)
-        // })
-        this.stage.projection.far -= this.i
-        console.log(this.stage.projection.far)
+        this.stage.figures.forEach((group) => {
+          group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
+          group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
+          group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
+        })
         break
       case 'a':
         m = Matrix3d.rotateY(m, -1)
@@ -189,7 +184,6 @@ export class IntroComponent implements OnDestroy {
     }
 
     camera.worldMatrix = Matrix3d.multiply(camera.worldMatrix, m)
-    this.animationQueue.push(this.draw.bind(this))
   }
 
   ngOnDestroy() {
@@ -225,10 +219,11 @@ export class IntroComponent implements OnDestroy {
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
     this.stage.figures.forEach((group) => {
-      group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
-      group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
-      group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
-     
+      
+      // group.worldMatrix = Matrix3d.rotateX(group.worldMatrix, this.play)
+      // group.worldMatrix = Matrix3d.rotateY(group.worldMatrix, this.play)
+      // group.worldMatrix = Matrix3d.rotateZ(group.worldMatrix, this.play)
+
       this.program.allocateTransform(group.worldMatrix, 'model_matrix');
       group.draw()
     })
@@ -238,4 +233,8 @@ export class IntroComponent implements OnDestroy {
 
   }
 
+}
+
+export function surfaceNormal(p1: IPoint3, p2: IPoint3, p3: IPoint3) {
+  return Point.dotProduct(Point.dif(p2, p1), Point.dif(p3, p1))
 }

@@ -3,22 +3,24 @@ import { IFigure, IRect2, IRect3 } from './contracts';
 import { Triangle } from './triangle';
 import { Vertex } from './vertex';
 import { SpaceConverter } from '../converter';
+import { Figure } from './figure';
 
-export class Plane implements IFigure {
-  public children: [Triangle, Triangle] | Plane[]
-  private color!: Color
+export class Plane extends Figure {
+  declare children: [Triangle, Triangle]
 
-  constructor(p1: IPoint3, p2: IPoint3, p3: IPoint3, p4: IPoint3, color?: typeof this.color) {
-    color = this.color = color || new Color(0.5, 0.5, 0.5)
+  constructor(p1: IPoint3, p2: IPoint3, p3: IPoint3, p4: IPoint3, color?: Color, parent?: IFigure) {
+    super(color, parent)
     const at = new Triangle(
       new Vertex(p1, color),
       new Vertex(p2, color),
       new Vertex(p3, color),
+      undefined, this,
     )
     const bt = new Triangle(
-      new Vertex(p4, color),
       at.c,
-      at.b,
+      new Vertex(p4, color),
+      at.a,
+      undefined, this,
     )
 
     this.children = [at, bt]
@@ -44,32 +46,4 @@ export class Plane implements IFigure {
     )
   }
 
-
-
-  get vertexes() {
-    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
-      acc.push(...child.vertexes)
-      return acc
-    }, [] as number[])
-  }
-
-  transformVertexes(transform: IMatrix3d) {
-    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
-      acc.push(...child.transformVertexes(transform))
-      return acc
-    }, [] as number[])
-  }
-
-  get colors() {
-    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
-      acc.push(...child.colors)
-      return acc
-    }, [] as number[])
-  }
-
-  get vertexesQty(): number {
-    return (this.children as Array<Plane | Triangle>).reduce((acc, child) => {
-      return acc + child.vertexesQty
-    }, 0)
-  }
 }

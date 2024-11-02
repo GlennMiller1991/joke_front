@@ -1,4 +1,4 @@
-import { IMatrix3d, IPoint2, IPoint3, identityMatrix3d } from '@fbltd/math';
+import { Color, IMatrix3d, IPoint2, IPoint3 } from '@fbltd/math';
 
 export type IRect2 = {
   width: number,
@@ -14,13 +14,17 @@ export type IRect3 = {
   origin: IPoint3
 }
 
-
 export interface IFigure {
+  parent?: IFigure
+  color?: Color
+
   get vertexes(): number[]
 
   get colors(): number[]
 
   get vertexesQty(): number
+
+  get points(): IPoint3[]
 
   transformVertexes(transform: IMatrix3d): IFigure['vertexes']
 }
@@ -55,3 +59,16 @@ export function getTransformedVertexes(figures: IFigure[], transform: IMatrix3d)
     return acc
   }, [] as number[])
 }
+
+export function getPoints(figures: IFigure[]) {
+  return figures.reduce((acc, p) => {
+    acc.push(...p.points)
+    return acc
+  }, [] as IPoint3[])
+}
+
+// export function getNormals(figures: IFigure[]) {
+//   return figures.reduce((acc, f) => {
+//     acc.push(f.normal)
+//     return acc
+//   }, [] as IPoint3[])

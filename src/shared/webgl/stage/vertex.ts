@@ -3,14 +3,23 @@ import { IFigure } from "./contracts";
 
 
 export class Vertex implements IFigure {
-
-    constructor(private point: IPoint3, private color: Color) {
+    constructor(private point: IPoint3, public color?: Color, public parent?: IFigure) {
     }
 
+    get points() {
+        return [this.point]
+    }
+
+
     get colors() {
+        if (!this.color) return []
         return [
             this.color.red, this.color.green, this.color.blue
         ];
+    }
+
+    get normal() {
+        return this.point
     }
 
     get vertexes() {

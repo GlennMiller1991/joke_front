@@ -1,11 +1,26 @@
 import { Color, IMatrix3d, IPoint3, Point } from "@fbltd/math";
 import { getColors, getTransformedVertexes, getVertexes, getVertexesQty, IFigure, IRect3 } from "./contracts";
 import { Plane } from "./plane";
+import { Figure } from "./figure";
 
-export class Cube implements IFigure {
-    planes: Plane[] = []
+export class Cube extends Figure {
+    declare children: Plane[]
 
-    constructor(rect: IRect3, color?: Color) {
+    constructor(color?: Color, parent?: IFigure) {
+        super(color, parent)
+
+    }
+
+    static ofPlanes(planes: Array<Plane>, color?: Color, parent?: IFigure) {
+        const cube = new Cube(color, parent)
+        cube.children = [
+            ...planes
+        ]
+        planes.forEach((p) => p.parent = cube)
+        return cube
+    }
+
+    static ofRect(rect: IRect3, color?: Color, parent?: IFigure) {
         const p1 = rect.origin
         const p2 = Point.sum(rect.origin, [rect.width, 0, 0])
         const p3 = Point.sum(rect.origin, [rect.width, 0, rect.depth])
@@ -18,31 +33,16 @@ export class Cube implements IFigure {
         const p8 = Point.sum(p4, dif)
 
 
-        this.planes.push(
-            new Plane(p1, p2, p4, p3, color),
-            new Plane(p5, p6, p8, p7, color),
-            new Plane(p1, p5,  p4, p8, color),
-            new Plane(p3, p7,  p2, p6, color),
-            new Plane(p1, p2,  p5, p6, color),
-            new Plane(p3, p4,  p7, p8, color),
-        )
-    }
+        const planes = [
+            new Plane(p1, p4, p3, p2, color, parent),
+            new Plane(p2, p6, p5, p1, color, parent),
+            new Plane(p1, p5, p8, p4, color, parent),
+            new Plane(p4, p8, p7, p3, color, parent),
+            new Plane(p3, p7, p6, p2, color, parent),
+            new Plane(p5, p6, p7, p8, color, parent),
+        ]
 
-    get vertexes() {
-        return getVertexes(this.planes)
+        return Cube.ofPlanes(planes, undefined, parent)
     }
-
-    get colors() {
-        return getColors(this.planes)
-    }
-
-    get vertexesQty() {
-        return getVertexesQty(this.planes)
-    }
-
-    transformVertexes(transform: IMatrix3d): IFigure["vertexes"] {
-        return getTransformedVertexes(this.planes, transform)
-    }
-
 
 }

@@ -20,10 +20,6 @@ export class Projection {
   }
 
   get transform(): IMatrixPerspective {
-    const angle = Angle.toRad(this.angleOfView)
-    const range = 2 / (this.far - this.near)
-    const halfAngle = angle / 2
-    const f = Math.tan(Math.PI / 2 - halfAngle)
     return [
       1, 0, 0, 0,
       0, 1, 0, 0,

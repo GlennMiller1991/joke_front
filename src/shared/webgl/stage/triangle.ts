@@ -1,44 +1,43 @@
-import { IMatrix2d, IMatrix3d } from '@fbltd/math';
-import { IFigure } from './contracts';
+import { Color, IMatrix2d, IMatrix3d } from '@fbltd/math';
+import { getColors, IFigure } from './contracts';
 import { Vertex } from './vertex';
+import { Figure } from './figure';
+import { surfaceNormal } from '../../../app/components/intro/intro.component';
 
-export class Triangle implements IFigure {
-  public red: number = 0.2
-  public green: number = 0.7
-  public blue: number = 0.1
+export class Triangle extends Figure {
+  declare children: [Vertex, Vertex, Vertex]
 
   constructor(
-    public a: Vertex,
-    public b: Vertex,
-    public c: Vertex,
+    a: Vertex,
+    b: Vertex,
+    c: Vertex,
+
+    color?: Color,
+    parent?: IFigure,
   ) {
-  }
-
-  get vertexes(): number[] {
-    return [
-      ...this.a.vertexes,
-      ...this.b.vertexes,
-      ...this.c.vertexes,
+    super(color, parent)
+    this.children = [
+      a, b, c
     ]
+    c.parent = b.parent = a.parent = this
+
   }
 
-  get colors(): number[] {
-    return [
-      ...this.a.colors,
-      ...this.b.colors,
-      ...this.c.colors,
-    ]
+
+  get normal() {
+    return surfaceNormal(this.a.normal, this.b.normal, this.c.normal)
   }
 
-  transformVertexes(transform: IMatrix3d): IFigure['vertexes'] {
-    return [
-      ...this.a.transformVertexes(transform),
-      ...this.b.transformVertexes(transform),
-      ...this.c.transformVertexes(transform),
-    ]
+  get a() {
+    return this.children[0]
   }
 
-  vertexesQty = 3
+  get b() {
+    return this.children[1]
+  }
 
+  get c() {
+    return this.children[2]
+  }
 
 }
