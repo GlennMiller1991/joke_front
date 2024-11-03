@@ -22,7 +22,7 @@ void main() {
     vec4 t = a_position;
     t = total_matrix * t;
     normal = total_matrix * a_normal;
-    direct_light_position = total_matrix * vec4(absolute_light_position, 1);
+    direct_light_position = projection_matrix * camera_matrix * vec4(absolute_light_position, 1);
 
     gl_Position =  t;
 }

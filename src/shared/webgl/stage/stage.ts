@@ -102,6 +102,7 @@ export class Stage {
   program: WebglProgram
   projection: Projection
   camera: Camera
+  sun = new Sun();
 
   constructor(program: WebglProgram) {
     this.program = program

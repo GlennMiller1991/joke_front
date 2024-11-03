@@ -195,16 +195,16 @@ export class IntroComponent implements OnDestroy {
   direction = 1
   i = 1
   r = 1
-  z = -1
+  z = 0
   play = 0
   fastCoef = 10
 
   circleEquation = (): IPoint3 => {
     const i = Angle.toRad(this.i)
     return [
+      this.z,
       Math.cos(i) * this.r,
       Math.sin(i) * this.r,
-      this.z
     ]
   }
 
@@ -213,14 +213,15 @@ export class IntroComponent implements OnDestroy {
 
     const projection = this.stage.projection
     const camera = this.stage.camera
+    const sun = this.stage.sun
     this.i += 1
-    camera.moveTo(this.circleEquation())
-    camera.lookAt([0, 0, 2])
 
     projection.allocateTransform();
     projection.allocateCopy();
-    const sun = new Sun();
-    sun.position = Matrix3d.apply(Matrix3d.translateIdentity(1, 1, 1), sun.position)
+    sun.position = this.circleEquation()
+    console.log(sun.position)
+    
+
     this.program.allocateVector(sun.position, 'absolute_light_position')
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')
 
@@ -242,11 +243,14 @@ export class IntroComponent implements OnDestroy {
 }
 
 export function surfaceNormal(p1: IPoint3, p2: IPoint3, p3: IPoint3): IPoint3 {
-  p2 = Point.dif(p2, p1)
-  p3 = Point.dif(p3, p1)
+  const product = crossProduct(Point.dif(p2, p1), Point.dif(p3, p1))
+  return product
+}
+
+export function crossProduct(a: IPoint3, b: IPoint3): IPoint3 {
   return [
-    p2[0] * p3[0],
-    p2[1] * p3[1],
-    p2[2] * p3[2],
+    a[1] * b[2] - b[1] * a[2],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - b[0] * a[1],
   ]
 }

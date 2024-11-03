@@ -9,6 +9,10 @@ in vec4 direct_light_position;
 
 void main() {
 
-    float light = dot(normal.xyz, direct_light_position.xyz);
+    vec3 n = normalize(normal.xyz);
+    vec3 l = normalize(direct_light_position.xyz);
+
+
+    float light = dot(n, l);
     outColor = vec4(color.xyz / 255.0 * light, 1);
 }
