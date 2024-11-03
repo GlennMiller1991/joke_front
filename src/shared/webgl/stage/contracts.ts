@@ -19,7 +19,7 @@ export interface ISurfaceHolder {
 }
 
 export interface ISurface {
-  get normal(): IPoint3
+  get normal(): number[]
 }
 
 

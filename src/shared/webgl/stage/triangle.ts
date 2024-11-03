@@ -25,7 +25,12 @@ export class Triangle extends Figure implements ISurface {
 
 
   get normal() {
-    return surfaceNormal(this.a.normal, this.b.normal, this.c.normal)
+    const normal = surfaceNormal(this.a.normal, this.b.normal, this.c.normal)
+    return [
+      ...normal,
+      ...normal,
+      ...normal,
+    ]
   }
 
   get a() {

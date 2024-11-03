@@ -27,7 +27,10 @@ export class Plane extends Figure implements ISurface {
   }
 
   get normal() {
-    return this.children[0].normal
+    return [
+      ...this.children[0].normal,
+      ...this.children[1].normal
+    ]
   }
 
   static ofRect2(rect: IRect2, color?: Color) {

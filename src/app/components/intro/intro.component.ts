@@ -121,10 +121,8 @@ export class IntroComponent implements OnDestroy {
     }
 
     if (this.play && !play) {
-      console.log('play')
       this.animationQueue.push(this.draw.bind(this))
     } else if (!this.play) {
-      console.log('clear')
       this.animationQueue.clear()
     }
   }
@@ -218,9 +216,7 @@ export class IntroComponent implements OnDestroy {
 
     projection.allocateTransform();
     projection.allocateCopy();
-    sun.position = this.circleEquation()
-    console.log(sun.position)
-    
+    sun.position = this.circleEquation()    
 
     this.program.allocateVector(sun.position, 'absolute_light_position')
     this.program.allocateTransform(Matrix3d.invert(camera.worldMatrix), 'camera_matrix')

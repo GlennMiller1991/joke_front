@@ -16,13 +16,12 @@ out vec4 normal;
 out vec4 direct_light_position;
 
 void main() {
-    color = a_color;
 
     mat4 total_matrix = projection_matrix * model_matrix * camera_matrix;
     vec4 t = a_position;
-    t = total_matrix * t;
+
     normal = total_matrix * a_normal;
     direct_light_position = projection_matrix * camera_matrix * vec4(absolute_light_position, 1);
-
-    gl_Position =  t;
+    color = a_color;
+    gl_Position =  total_matrix * a_position;
 }
